@@ -1,0 +1,6 @@
+x file management process (backend?)
+x cmd-o to open files
+x cmd-s to save fils
+cmd-[ and cmd-] for navigation along headers
+x file accordion in sidebar
+navigation menu bar
