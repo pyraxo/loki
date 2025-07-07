@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+
+# Repository Overview
+
+## Top-level
+
+- **src/** – React + TypeScript frontend code.
+  - **components/** – Reusable UI components and node definitions.
+  - **lib/** – Shared utilities, Zustand store, global state helpers.
+  - **pages/** – Route-level components (Index.tsx, NotFound.tsx).
+  - **hooks/** – Custom React hooks.
+- **src-tauri/** – Rust backend for Tauri:
+  - **src/** – `main.rs`, Tauri commands, Rust helpers.
+  - **icons/** – Application icons for packaging.
+- **docs/** – Internal documentation (PRD, architecture notes).
+- **.cursor/rules/** – Cursor rule files like this one.
+
+## Navigation Tips
+
+• When searching for frontend logic, start in `src/components/` or `src/lib/`.  
+• Node implementations live in `src/components/nodes.tsx`; add new node types here.  
+• Global state is managed in `src/lib/store.ts` using Zustand.  
+• Rust commands exposed to the frontend are defined in `src-tauri/src/main.rs`.  
+• Documentation lives in `docs/` – update PRD & architecture docs here.
