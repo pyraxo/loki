@@ -108,7 +108,7 @@ Persist using `createJSONStorage` + Tauri FS.
 
 ### Phase 2 – Multi-Canvas & Persistence
 
-• Build sidebar UI to create/rename/delete canvases  
+• Build sidebar UI to create/rename/delete canvases
 • Establish Zustand store structure  
 • Implement local save/load via Tauri FS
 

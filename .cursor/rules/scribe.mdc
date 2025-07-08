@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+# Scribe Requirements
+
+- When a project directory is added or changed, always update the repo structure file (`.cursor/repo-structure.mdc`).
+- When a new feature has been implemented, always add the updates to the changelog (`docs/changelog.md`).

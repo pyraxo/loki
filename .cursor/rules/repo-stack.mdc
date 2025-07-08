@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+# Tech Stack
+
+- Use `bun` to manage dependencies and run scripts

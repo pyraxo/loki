@@ -19,8 +19,8 @@ alwaysApply: true
 
 ## Navigation Tips
 
-• When searching for frontend logic, start in `src/components/` or `src/lib/`.  
-• Node implementations live in `src/components/nodes.tsx`; add new node types here.  
-• Global state is managed in `src/lib/store.ts` using Zustand.  
-• Rust commands exposed to the frontend are defined in `src-tauri/src/main.rs`.  
-• Documentation lives in `docs/` – update PRD & architecture docs here.
+- When searching for frontend logic, start in `src/components/` or `src/lib/`.
+- Node implementations live in `src/components/nodes.tsx`; add new node types here.
+- Global state is managed in `src/lib/store.ts` using Zustand.
+- Rust commands exposed to the frontend are defined in `src-tauri/src/main.rs`.
+- Documentation lives in `docs/` – update PRD & architecture docs here.
