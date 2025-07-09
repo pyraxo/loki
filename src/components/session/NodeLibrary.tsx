@@ -9,6 +9,11 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { NodeType } from "@/types/nodes";
 
 interface NodeTypeInfo {
@@ -159,26 +164,30 @@ export default function NodeLibrary() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold mb-1">Node Library</h2>
-        <p className="text-sm text-muted-foreground">
-          Drag nodes to the canvas to build your workflow
-        </p>
-      </div>
+      <ScrollArea className="flex-1 h-full">
+        {/* Header */}
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-semibold mb-1">Node Library</h2>
+          <p className="text-sm text-muted-foreground">
+            Drag nodes to the canvas to build your workflow
+          </p>
+        </div>
 
-      {/* Node Categories */}
-      <ScrollArea className="flex-1">
+        {/* Node Categories */}
         <div className="p-4 space-y-6">
           {nodesByCategory.map((category) => (
             <div key={category.name}>
               <div className="mb-3">
-                <h3 className="font-medium text-sm text-foreground mb-1">
-                  {category.name}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {category.description}
-                </p>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <h3 className="font-medium text-sm text-foreground mb-1 cursor-help">
+                      {category.name}
+                    </h3>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{category.description}</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <div className="space-y-1">
@@ -190,21 +199,6 @@ export default function NodeLibrary() {
           ))}
         </div>
       </ScrollArea>
-
-      {/* Footer */}
-      <div className="p-4 border-t">
-        <div className="text-xs text-muted-foreground text-center">
-          <p className="mb-1">
-            Available:{" "}
-            {NODE_TYPES.filter((n) => !n.badge?.includes("Coming")).length}{" "}
-            nodes
-          </p>
-          <p>
-            Coming soon:{" "}
-            {NODE_TYPES.filter((n) => n.badge?.includes("Coming")).length} more
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
