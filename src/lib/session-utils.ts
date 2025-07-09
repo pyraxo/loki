@@ -198,11 +198,30 @@ export const SessionUtils = {
 
 // Keyboard shortcuts for session management
 export function useSessionShortcuts() {
-  const { createSession, saveSession, loadSession, sessions, activeSessionId } =
-    useStore();
+  const {
+    createSession,
+    saveSession,
+    loadSession,
+    sessions,
+    activeSessionId,
+    duplicateSession,
+    renameSession,
+    exportSession,
+    deleteSession,
+    showConfirmationDialog,
+    showRenameDialog,
+  } = useStore();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if focus is on an input element
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          (activeElement as HTMLElement).contentEditable === "true");
+
       // Cmd/Ctrl + N - New session
       if ((event.metaKey || event.ctrlKey) && event.key === "n") {
         event.preventDefault();
@@ -214,6 +233,80 @@ export function useSessionShortcuts() {
         event.preventDefault();
         if (activeSessionId) {
           saveSession();
+        }
+      }
+
+      // F2 - Rename active session
+      if (event.key === "F2" && !isInputFocused && activeSessionId) {
+        event.preventDefault();
+        const currentSession = sessions[activeSessionId];
+        if (currentSession) {
+          showRenameDialog(
+            "Rename Session",
+            currentSession.name,
+            (newName: string) => renameSession(activeSessionId, newName)
+          );
+        }
+      }
+
+      // Cmd/Ctrl + D - Duplicate active session
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key === "d" &&
+        !isInputFocused &&
+        activeSessionId
+      ) {
+        event.preventDefault();
+        duplicateSession(activeSessionId);
+      }
+
+      // Cmd/Ctrl + E - Export active session
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key === "e" &&
+        !isInputFocused &&
+        activeSessionId
+      ) {
+        event.preventDefault();
+        const currentSession = sessions[activeSessionId];
+        if (currentSession) {
+          exportSession(activeSessionId)
+            .then((exportData) => {
+              if (exportData) {
+                const blob = new Blob([exportData], {
+                  type: "application/json",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${currentSession.name}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }
+            })
+            .catch((error) => {
+              console.error("Export failed:", error);
+            });
+        }
+      }
+
+      // Cmd/Ctrl + Delete - Delete active session (with confirmation)
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key === "Delete" &&
+        !isInputFocused &&
+        activeSessionId
+      ) {
+        event.preventDefault();
+        const currentSession = sessions[activeSessionId];
+        if (currentSession) {
+          showConfirmationDialog(
+            "Delete Session",
+            `Are you sure you want to delete "${currentSession.name}"? This action cannot be undone.`,
+            () => deleteSession(activeSessionId)
+          );
         }
       }
 
@@ -230,7 +323,19 @@ export function useSessionShortcuts() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [createSession, saveSession, loadSession, sessions, activeSessionId]);
+  }, [
+    createSession,
+    saveSession,
+    loadSession,
+    sessions,
+    activeSessionId,
+    duplicateSession,
+    renameSession,
+    exportSession,
+    deleteSession,
+    showConfirmationDialog,
+    showRenameDialog,
+  ]);
 }
 
 // Beforeunload handler for unsaved changes

@@ -147,11 +147,11 @@ function NodeItem({ nodeType }: NodeItemProps) {
         <p className="text-xs text-muted-foreground">{nodeType.description}</p>
       </div>
 
-      {!isDisabled && (
+      {/* {!isDisabled && (
         <div className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-muted-foreground">
           Drag
         </div>
-      )}
+      )} */}
     </div>
   );
 }

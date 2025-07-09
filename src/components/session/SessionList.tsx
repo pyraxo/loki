@@ -176,11 +176,11 @@ export default function SessionList() {
       </div>
 
       {/* Footer */}
-      {displayedSessions.length > 0 && (
+      {/* {displayedSessions.length > 0 && (
         <div className="p-2 border-t text-xs text-muted-foreground text-center">
           {displayedSessions.length} of {Object.keys(sessions).length} sessions
         </div>
-      )}
+      )} */}
     </div>
   );
 }

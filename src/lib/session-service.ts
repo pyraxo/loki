@@ -183,7 +183,8 @@ class SessionService {
   // Update session metadata
   async updateSessionMetadata(
     sessionId: string,
-    metadata: Partial<SessionMetadata>
+    metadata: Partial<SessionMetadata>,
+    updateTimestamp: boolean = false
   ): Promise<void> {
     const store = await this.ensureStore();
 
@@ -193,7 +194,8 @@ class SessionService {
     const updatedSession: Session = {
       ...session,
       metadata: { ...session.metadata, ...metadata },
-      updatedAt: new Date().toISOString(),
+      // Only update timestamp for meaningful changes, not status updates
+      ...(updateTimestamp && { updatedAt: new Date().toISOString() }),
     };
 
     await store.set(sessionId, updatedSession);

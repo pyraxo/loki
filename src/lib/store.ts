@@ -30,9 +30,27 @@ interface CanvasState {
   autoSaveEnabled: boolean;
   hasUnsavedChanges: boolean;
 
+  // Confirmation dialog state
+  confirmationDialog: {
+    isOpen: boolean;
+    title: string;
+    description: string;
+    onConfirm: (() => void) | null;
+  };
+
+  // Rename dialog state
+  renameDialog: {
+    isOpen: boolean;
+    title: string;
+    currentValue: string;
+    onConfirm: ((newName: string) => void) | null;
+  };
+
   // Canvas actions
   setNodes: (nodes: CustomNode[]) => void;
   setEdges: (edges: Edge[]) => void;
+  setNodesInternal: (nodes: CustomNode[]) => void; // For React Flow internal changes
+  setEdgesInternal: (edges: Edge[]) => void; // For React Flow internal changes
   updateNodeData: (nodeId: string, data: Partial<NodeData>) => void;
   updateNodeStatus: (
     nodeId: string,
@@ -59,7 +77,8 @@ interface CanvasState {
   setActiveSession: (sessionId: string) => void;
   updateSessionMetadata: (
     sessionId: string,
-    metadata: Partial<SessionMetadata>
+    metadata: Partial<SessionMetadata>,
+    updateTimestamp?: boolean
   ) => void;
   markSessionAsUnsaved: (sessionId?: string) => void;
   markSessionAsRunning: (sessionId?: string) => void;
@@ -79,6 +98,22 @@ interface CanvasState {
   enableAutoSave: () => void;
   disableAutoSave: () => void;
   triggerAutoSave: () => Promise<void>;
+
+  // Confirmation dialog
+  showConfirmationDialog: (
+    title: string,
+    description: string,
+    onConfirm: () => void
+  ) => void;
+  hideConfirmationDialog: () => void;
+
+  // Rename dialog
+  showRenameDialog: (
+    title: string,
+    currentValue: string,
+    onConfirm: (newName: string) => void
+  ) => void;
+  hideRenameDialog: () => void;
 
   // Initialization
   initializeStore: () => Promise<void>;
@@ -105,6 +140,22 @@ export const useStore = create<CanvasState>((set, get) => ({
   autoSaveEnabled: true,
   hasUnsavedChanges: false,
 
+  // Initial confirmation dialog state
+  confirmationDialog: {
+    isOpen: false,
+    title: "",
+    description: "",
+    onConfirm: null,
+  },
+
+  // Initial rename dialog state
+  renameDialog: {
+    isOpen: false,
+    title: "",
+    currentValue: "",
+    onConfirm: null,
+  },
+
   // Canvas actions
   setNodes: (nodes: CustomNode[]) => {
     set({ nodes, hasUnsavedChanges: true });
@@ -114,6 +165,15 @@ export const useStore = create<CanvasState>((set, get) => ({
   setEdges: (edges: Edge[]) => {
     set({ edges, hasUnsavedChanges: true });
     get().markSessionAsUnsaved();
+  },
+
+  // Internal setters for React Flow changes (don't mark as unsaved)
+  setNodesInternal: (nodes: CustomNode[]) => {
+    set({ nodes });
+  },
+
+  setEdgesInternal: (edges: Edge[]) => {
+    set({ edges });
   },
 
   updateNodeData: (nodeId: string, data: Partial<NodeData>) => {
@@ -164,7 +224,7 @@ export const useStore = create<CanvasState>((set, get) => ({
 
     const { activeSessionId } = get();
     if (activeSessionId) {
-      get().updateSessionMetadata(activeSessionId, { isRunning: false });
+      get().updateSessionMetadata(activeSessionId, { isRunning: false }, false);
     }
   },
 
@@ -405,7 +465,8 @@ export const useStore = create<CanvasState>((set, get) => ({
 
   updateSessionMetadata: (
     sessionId: string,
-    metadata: Partial<SessionMetadata>
+    metadata: Partial<SessionMetadata>,
+    updateTimestamp: boolean = false
   ) => {
     const { sessions } = get();
     const session = sessions[sessionId];
@@ -419,7 +480,7 @@ export const useStore = create<CanvasState>((set, get) => ({
     set({ sessions: { ...sessions, [sessionId]: updatedSession } });
 
     // Also update in persistence
-    sessionService.updateSessionMetadata(sessionId, metadata);
+    sessionService.updateSessionMetadata(sessionId, metadata, updateTimestamp);
   },
 
   markSessionAsUnsaved: (sessionId?: string) => {
@@ -427,10 +488,14 @@ export const useStore = create<CanvasState>((set, get) => ({
     const targetSessionId = sessionId || activeSessionId;
 
     if (targetSessionId) {
-      get().updateSessionMetadata(targetSessionId, {
-        hasUnsavedChanges: true,
-        status: SessionStatus.UNSAVED,
-      });
+      get().updateSessionMetadata(
+        targetSessionId,
+        {
+          hasUnsavedChanges: true,
+          status: SessionStatus.UNSAVED,
+        },
+        true
+      ); // Update timestamp since this represents actual content changes
     }
   },
 
@@ -439,20 +504,28 @@ export const useStore = create<CanvasState>((set, get) => ({
     const targetSessionId = sessionId || activeSessionId;
 
     if (targetSessionId) {
-      get().updateSessionMetadata(targetSessionId, {
-        isRunning: true,
-        status: SessionStatus.RUNNING,
-        lastExecutionTime: new Date().toISOString(),
-      });
+      get().updateSessionMetadata(
+        targetSessionId,
+        {
+          isRunning: true,
+          status: SessionStatus.RUNNING,
+          lastExecutionTime: new Date().toISOString(),
+        },
+        false
+      ); // Don't update timestamp for status changes
     }
   },
 
   markSessionAsError: (sessionId: string, error: string) => {
-    get().updateSessionMetadata(sessionId, {
-      isRunning: false,
-      status: SessionStatus.ERROR,
-      errorMessage: error,
-    });
+    get().updateSessionMetadata(
+      sessionId,
+      {
+        isRunning: false,
+        status: SessionStatus.ERROR,
+        errorMessage: error,
+      },
+      false
+    ); // Don't update timestamp for status changes
   },
 
   // Search and filtering
@@ -557,6 +630,60 @@ export const useStore = create<CanvasState>((set, get) => ({
     }
   },
 
+  // Confirmation dialog
+  showConfirmationDialog: (
+    title: string,
+    description: string,
+    onConfirm: () => void
+  ) => {
+    set({
+      confirmationDialog: {
+        isOpen: true,
+        title,
+        description,
+        onConfirm,
+      },
+    });
+  },
+
+  hideConfirmationDialog: () => {
+    set({
+      confirmationDialog: {
+        isOpen: false,
+        title: "",
+        description: "",
+        onConfirm: null,
+      },
+    });
+  },
+
+  // Rename dialog
+  showRenameDialog: (
+    title: string,
+    currentValue: string,
+    onConfirm: (newName: string) => void
+  ) => {
+    set({
+      renameDialog: {
+        isOpen: true,
+        title,
+        currentValue,
+        onConfirm,
+      },
+    });
+  },
+
+  hideRenameDialog: () => {
+    set({
+      renameDialog: {
+        isOpen: false,
+        title: "",
+        currentValue: "",
+        onConfirm: null,
+      },
+    });
+  },
+
   // Initialization
   initializeStore: async () => {
     set({ isLoading: true, error: null });
@@ -568,7 +695,7 @@ export const useStore = create<CanvasState>((set, get) => ({
       // Create default session if no sessions exist
       const { sessions } = get();
       if (Object.keys(sessions).length === 0) {
-        await get().createSession("Audio Processing");
+        await get().createSession("Example Session");
       }
 
       set({ isLoading: false });

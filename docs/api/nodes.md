@@ -6,6 +6,71 @@ Loki's visual workflow system is built around a flexible node-based architecture
 
 All nodes share a common visual structure with draggable headers, status indicators, and connection handles that enable building sophisticated LLM workflows through simple drag-and-drop interactions.
 
+## Node Creation and Interaction
+
+### Context Menu System
+
+The canvas uses a right-click context menu system for intuitive node creation and management. The context menu is organized by node categories for easy discovery:
+
+#### Canvas Context Menu
+
+Right-click anywhere on the empty canvas to access the node creation menu:
+
+- **Control**: Workflow control nodes (Start)
+- **Input**: Data input nodes (Text Prompt)
+- **AI**: AI processing nodes (LLM Invocation)
+- **Output**: Result output nodes (Output)
+- **Utility**: Helper utility nodes (Coming Soon)
+
+Each menu item displays:
+
+- Node icon for visual identification
+- Node name and description
+- Keyboard shortcut (if available)
+- Disabled state for future node types
+
+#### Keyboard Shortcuts
+
+**Canvas Operations:**
+
+- `Cmd/Ctrl + 1` - Create Start Node
+- `Cmd/Ctrl + 2` - Create Text Prompt Node
+- `Cmd/Ctrl + 3` - Create LLM Invocation Node
+- `Cmd/Ctrl + 4` - Create Output Node
+- `Delete/Backspace` - Delete selected nodes and edges
+
+**Node Positioning:**
+
+- Context menu creation: Node appears at cursor position
+- Keyboard creation: Node appears at canvas center
+- Automatic offset: Prevents overlapping with existing nodes
+
+#### Smart Focus Detection
+
+All keyboard shortcuts are intelligently disabled when:
+
+- Typing in input fields (textarea, input)
+- Editing contenteditable elements
+- Focus is on form controls
+
+This prevents accidental node creation while editing node properties.
+
+### Interaction Patterns
+
+**Right-Click Workflow:**
+
+1. Right-click on empty canvas area
+2. Select desired node type from categorized menu
+3. Node appears at cursor position
+4. Continue building workflow by connecting nodes
+
+**Keyboard Workflow:**
+
+1. Use `Cmd/Ctrl + [1-4]` to quickly create nodes
+2. Nodes appear in canvas center
+3. Drag to desired position
+4. Use `Delete` to remove selected elements
+
 ## Node Architecture
 
 ### Common Properties

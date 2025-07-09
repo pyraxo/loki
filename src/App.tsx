@@ -1,5 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { RenameDialog } from "@/components/ui/rename-dialog";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -12,6 +14,8 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <ConfirmationDialog />
+        <RenameDialog />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
