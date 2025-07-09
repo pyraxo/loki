@@ -4,4 +4,4 @@ alwaysApply: true
 
 # Tech Stack
 
-- Use `bun` to manage dependencies and run scripts
+- Use `bun` to manage dependencies and run scripts. Never run a new instance of `bun run dev`.

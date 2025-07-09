@@ -14,7 +14,7 @@ alwaysApply: true
 - **src-tauri/** – Rust backend for Tauri:
   - **src/** – `main.rs`, Tauri commands, Rust helpers.
   - **icons/** – Application icons for packaging.
-- **docs/** – Internal documentation (PRD, architecture notes).
+- **docs/** – Internal documentation (PRD, architecture notes, nodes documentation, changelog).
 - **.cursor/rules/** – Cursor rule files like this one.
 
 ## Navigation Tips

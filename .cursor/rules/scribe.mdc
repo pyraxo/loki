@@ -2,7 +2,17 @@
 alwaysApply: true
 ---
 
-# Scribe Requirements
+# Documentation Scribe
+
+## General Requirements
 
 - When a project directory is added or changed, always update the repo structure file (`.cursor/repo-structure.mdc`).
+
+## Implementation Plans
+
+- When you are saving an implementation plan from Planner Mode, save it in the `doc/plans` folder in the format `DDMMYY-filename.md`. For e.g., `docs/plans/090725-sidebar-plan.md`.
+
+## Feature Completion
+
 - When a new feature has been implemented, always add the updates to the changelog (`docs/changelog.md`).
+- Always update the features in the corresponding documentation in `docs/api`.
