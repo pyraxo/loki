@@ -34,8 +34,9 @@ function StartNode({ data }: NodeProps) {
   }, [workflow.isRunning, startWorkflow, stopWorkflow]);
 
   return (
-    <Card className="w-64 min-h-[120px] border-2 border-green-500">
-      <CardHeader className="pb-2">
+    <Card className="w-64 min-h-[120px] border-2 border-green-500 cursor-default">
+      {/* Draggable Header */}
+      <CardHeader className="pb-2 pt-0 px-4 cursor-move border-b-1 rounded-t-lg node-drag">
         <CardTitle className="text-sm flex items-center justify-between">
           🚀 Start
           <Badge
@@ -45,6 +46,7 @@ function StartNode({ data }: NodeProps) {
           </Badge>
         </CardTitle>
       </CardHeader>
+      {/* Non-draggable Content */}
       <CardContent>
         <div className="text-xs text-muted-foreground mb-3">
           {nodeData.workflowName}
@@ -105,9 +107,14 @@ function TextPromptNode({ data }: NodeProps) {
   };
 
   return (
-    <Card className={`w-80 min-h-[200px] ${getStatusColor()} border-2`}>
+    <Card
+      className={`w-80 min-h-[200px] ${getStatusColor()} border-2 cursor-default`}
+    >
       <Handle type="target" position={Position.Top} />
-      <CardHeader className="pb-2">
+      {/* Draggable Header */}
+      <CardHeader
+        className={`pb-2 pt-0 px-4 cursor-move border-b-1 rounded-t-lg node-drag`}
+      >
         <CardTitle className="text-sm flex items-center justify-between">
           📝 Text Prompt
           <Badge
@@ -117,6 +124,7 @@ function TextPromptNode({ data }: NodeProps) {
           </Badge>
         </CardTitle>
       </CardHeader>
+      {/* Non-draggable Content */}
       <CardContent>
         <Textarea
           value={localText}
@@ -170,10 +178,28 @@ function LLMInvocationNode({ data }: NodeProps) {
     }
   };
 
+  const getHeaderBg = () => {
+    switch (nodeData.status) {
+      case "running":
+        return "bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200";
+      case "success":
+        return "bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200";
+      case "error":
+        return "bg-gradient-to-r from-red-50 to-red-100 border-b border-red-200";
+      default:
+        return "bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200";
+    }
+  };
+
   return (
-    <Card className={`w-80 min-h-[250px] ${getStatusColor()} border-2`}>
+    <Card
+      className={`w-80 min-h-[250px] ${getStatusColor()} border-2 cursor-default`}
+    >
       <Handle type="target" position={Position.Top} />
-      <CardHeader className="pb-2">
+      {/* Draggable Header */}
+      <CardHeader
+        className={`pb-2 pt-0 px-4 cursor-move border-b-1 rounded-t-lg node-drag`}
+      >
         <CardTitle className="text-sm flex items-center justify-between">
           🤖 LLM Invocation
           <Badge
@@ -190,6 +216,7 @@ function LLMInvocationNode({ data }: NodeProps) {
           </Badge>
         </CardTitle>
       </CardHeader>
+      {/* Non-draggable Content */}
       <CardContent className="space-y-3">
         <div>
           <label className="text-xs font-medium">Model</label>
@@ -270,10 +297,28 @@ function OutputNode({ data }: NodeProps) {
     }
   };
 
+  // const getHeaderBg = () => {
+  //   switch (nodeData.status) {
+  //     case "running":
+  //       return "bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200";
+  //     case "success":
+  //       return "bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200";
+  //     case "error":
+  //       return "bg-gradient-to-r from-red-50 to-red-100 border-b border-red-200";
+  //     default:
+  //       return "bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200";
+  //   }
+  // };
+
   return (
-    <Card className={`w-96 min-h-[300px] ${getStatusColor()} border-2`}>
+    <Card
+      className={`w-96 min-h-[300px] ${getStatusColor()} border-2 cursor-default`}
+    >
       <Handle type="target" position={Position.Top} />
-      <CardHeader className="pb-2">
+      {/* Draggable Header */}
+      <CardHeader
+        className={`pb-2 pt-0 px-4 cursor-move border-b-1 rounded-t-lg node-drag`}
+      >
         <CardTitle className="text-sm flex items-center justify-between">
           📄 Output
           <Badge
@@ -290,6 +335,7 @@ function OutputNode({ data }: NodeProps) {
           </Badge>
         </CardTitle>
       </CardHeader>
+      {/* Non-draggable Content */}
       <CardContent>
         <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded min-h-[200px] text-sm">
           {nodeData.isStreaming && nodeData.streamedContent ? (

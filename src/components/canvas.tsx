@@ -30,6 +30,7 @@ const initialNodes = [
       status: "idle" as const,
     },
     type: NodeType.START,
+    dragHandle: ".node-drag",
   },
   {
     id: "text-1",
@@ -41,6 +42,7 @@ const initialNodes = [
       characterCount: 32,
     },
     type: NodeType.TEXT_PROMPT,
+    dragHandle: ".node-drag",
   },
   {
     id: "llm-1",
@@ -53,6 +55,7 @@ const initialNodes = [
       status: "idle" as const,
     },
     type: NodeType.LLM_INVOCATION,
+    dragHandle: ".node-drag",
   },
   {
     id: "output-1",
@@ -64,6 +67,7 @@ const initialNodes = [
       status: "idle" as const,
     },
     type: NodeType.OUTPUT,
+    dragHandle: ".node-drag",
   },
 ];
 
