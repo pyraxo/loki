@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-mono: "TX-02", "JetBrains Mono";
+  --font-mono: "TX-02", "Fira Mono", "JetBrains Mono";
 }
 
 @theme inline {
