@@ -141,6 +141,7 @@ export class ExecutionEngine {
               isStreaming: true,
               content: "",
               streamedContent: "",
+              tokenCount: undefined, // Clear any previous token count
             });
             (useStore.getState() as any).updateNodeStatus(
               outputNode.id,

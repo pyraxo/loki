@@ -37,6 +37,14 @@
 - **Real Connection Testing**: Implemented actual API connection testing for OpenAI to validate keys by making real API calls
 - **User-Friendly Validation**: API keys are now validated by testing if they actually work, not by arbitrary format rules
 
+#### Output Node NaN Display Issue
+
+- **Fixed NaN Token Count**: Resolved issue where output nodes displayed "NaN" instead of token counts after successful streaming
+- **Root Cause**: The AI SDK sometimes returns `undefined` for `usage.totalTokens`, which was being passed through and displayed as NaN
+- **Solution**: Added validation in LLM service to only pass valid numbers for token counts, and enhanced OutputNode to safely handle invalid token counts
+- **Defensive Programming**: OutputNode now checks for `typeof tokenCount === 'number' && !isNaN(tokenCount)` before displaying
+- **Clean State**: Token count is cleared at the start of each new streaming operation to prevent stale NaN values
+
 #### Session Loading Issue
 
 - **Fixed Session Unsaved State**: Resolved issue where clicking on a session would immediately mark it as unsaved

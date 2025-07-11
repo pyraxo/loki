@@ -55,11 +55,13 @@ class OutputNodeClass extends BaseNode<OutputNodeData> {
           )}
         </div>
 
-        {this.data.tokenCount && (
-          <div className="mt-2 text-xs text-muted-foreground">
-            Tokens: {this.data.tokenCount}
-          </div>
-        )}
+        {this.data.tokenCount &&
+          typeof this.data.tokenCount === "number" &&
+          !isNaN(this.data.tokenCount) && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              Tokens: {this.data.tokenCount}
+            </div>
+          )}
 
         {this.data.error && (
           <div className="mt-2 text-xs text-red-500 bg-red-50 p-2 rounded">

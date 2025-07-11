@@ -1,7 +1,7 @@
 import { streamText } from "ai";
-import { openai, createOpenAI } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { settingsService } from "./settings-service";
-import { type LLMProvider, PROVIDER_METADATA } from "@/types/settings";
+import { PROVIDER_METADATA } from "@/types/settings";
 
 export interface LLMParams {
   model: "gpt-4" | "gpt-3.5-turbo" | "claude-3-haiku" | "claude-3-sonnet";
@@ -90,7 +90,13 @@ export class LLMService {
 
       // Get final usage stats if available
       const usage = await result.usage;
-      callbacks.onComplete(fullContent, usage?.totalTokens);
+      const tokenCount = usage?.totalTokens;
+      callbacks.onComplete(
+        fullContent,
+        typeof tokenCount === "number" && !isNaN(tokenCount)
+          ? tokenCount
+          : undefined
+      );
     } catch (error) {
       console.error("LLM Service Error:", error);
       const errorMessage =
@@ -120,9 +126,13 @@ export class LLMService {
       }
 
       const usage = await result.usage;
+      const tokenCount = usage?.totalTokens;
       return {
         content: fullContent,
-        tokenCount: usage?.totalTokens,
+        tokenCount:
+          typeof tokenCount === "number" && !isNaN(tokenCount)
+            ? tokenCount
+            : undefined,
       };
     } catch (error) {
       console.error("LLM Service Error:", error);
