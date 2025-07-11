@@ -1,6 +1,45 @@
 # Changelog
 
-## [Unreleased] - 2025-01-25
+## [Unreleased] - 2025-07-11
+
+### ✨ Major Features Added
+
+#### LLM Workflow Execution System
+
+- **Multiple Output Streaming**: LLM invocation nodes now stream identical content to ALL connected output nodes simultaneously
+- **Content Preservation**: Output nodes preserve previous run content until new streaming data arrives, eliminating unwanted content clearing
+- **Enhanced Error Handling**: Errors propagate to all connected output nodes with proper state cleanup and descriptive error messages
+- **Coordinated Status Management**: Both global workflow state and individual node states work together seamlessly
+- **Real-time Visual Feedback**: All nodes show appropriate status indicators during execution and streaming phases
+
+#### Execution Engine Improvements
+
+- **Broadcasting Streams**: Modified `executeLLMNode()` to find ALL connected output nodes instead of just the first one
+- **Parallel Output Updates**: All streaming callbacks (`onStart`, `onContent`, `onComplete`, `onError`) now use `forEach` loops to broadcast to multiple outputs
+- **Smart Content Management**: Output nodes connected to LLM nodes preserve content, while those connected to text nodes update immediately
+- **Error State Cleanup**: Error handling now properly cleans up streaming state and provides contextual error messages
+- **Workflow Coordination**: Improved dependency-based execution flow for optimal streaming performance
+
+### 🐛 Bug Fixes
+
+#### Streaming and Output Issues
+
+- **Fixed Single Output Limitation**: Resolved issue where LLM nodes only streamed to the first connected output node
+- **Fixed Content Clearing**: Eliminated unwanted content clearing on workflow restart - content now persists until new data arrives
+- **Fixed Error Propagation**: Errors now properly propagate to all connected output nodes with appropriate cleanup
+- **Enhanced Stream Coordination**: Multiple output nodes now show synchronized streaming indicators and content
+
+### 🏗️ Technical Improvements
+
+#### Execution Flow
+
+- **Stream Fanout**: Implemented proper stream broadcasting to multiple output nodes
+- **State Consistency**: Enhanced state management to maintain consistency across global workflow and individual node states
+- **Performance Optimization**: Optimized streaming updates to minimize unnecessary re-renders while maintaining real-time feedback
+
+---
+
+## [Previous] - 2025-01-25
 
 ### ✨ Major Features Added
 

@@ -88,12 +88,21 @@ export class ExecutionEngine {
           break;
 
         case NodeType.OUTPUT:
-          // Output nodes receive content from their inputs
+          // Output nodes primarily receive content via streaming from LLM nodes
+          // Only update if connected to non-LLM inputs (like text nodes)
           const inputText = this.getInputText(node.id, edges, nodes);
-          (useStore.getState() as any).updateNodeData(node.id, {
-            content: inputText,
-            isStreaming: false,
-          });
+          const inputNodes = this.getInputNodes(node.id, edges, nodes);
+          const hasLLMInput = inputNodes.some(
+            (n) => n.type === NodeType.LLM_INVOCATION
+          );
+
+          // Only update content if not connected to LLM (to preserve streaming content)
+          if (!hasLLMInput && inputText.trim()) {
+            (useStore.getState() as any).updateNodeData(node.id, {
+              content: inputText,
+              isStreaming: false,
+            });
+          }
           (useStore.getState() as any).updateNodeStatus(node.id, "success");
           break;
 
@@ -122,9 +131,11 @@ export class ExecutionEngine {
       throw new Error("No input text provided to LLM node");
     }
 
-    // Find connected output nodes to stream to
+    // Find connected output nodes to stream to - GET ALL OUTPUT NODES
     const outputNodes = this.getOutputNodes(node.id, edges, nodes);
-    const outputNode = outputNodes.find((n) => n.type === NodeType.OUTPUT);
+    const connectedOutputNodes = outputNodes.filter(
+      (n) => n.type === NodeType.OUTPUT
+    );
 
     const params: LLMParams = {
       model: nodeData.model,
@@ -136,10 +147,10 @@ export class ExecutionEngine {
     return new Promise((resolve, reject) => {
       LLMService.streamCompletion(inputText, params, {
         onStart: () => {
-          if (outputNode) {
+          // Stream to ALL connected output nodes
+          connectedOutputNodes.forEach((outputNode) => {
             (useStore.getState() as any).updateNodeData(outputNode.id, {
               isStreaming: true,
-              content: "",
               streamedContent: "",
               tokenCount: undefined, // Clear any previous token count
             });
@@ -147,21 +158,23 @@ export class ExecutionEngine {
               outputNode.id,
               "running"
             );
-          }
+          });
         },
 
         onContent: (content: string) => {
-          if (outputNode) {
+          // Broadcast identical content to ALL connected output nodes
+          connectedOutputNodes.forEach((outputNode) => {
             (useStore.getState() as any).updateNodeData(outputNode.id, {
               streamedContent: content,
             });
-          }
+          });
         },
 
         onComplete: (finalContent: string, tokenCount?: number) => {
           (useStore.getState() as any).updateNodeStatus(node.id, "success");
 
-          if (outputNode) {
+          // Update ALL connected output nodes with final content
+          connectedOutputNodes.forEach((outputNode) => {
             (useStore.getState() as any).updateNodeData(outputNode.id, {
               content: finalContent,
               isStreaming: false,
@@ -172,19 +185,32 @@ export class ExecutionEngine {
               outputNode.id,
               "success"
             );
-          }
+          });
 
           resolve();
         },
 
         onError: (error: string) => {
-          if (outputNode) {
+          // Mark LLM node as error first
+          (useStore.getState() as any).updateNodeStatus(
+            node.id,
+            "error",
+            error
+          );
+
+          // Propagate error to ALL connected output nodes
+          connectedOutputNodes.forEach((outputNode) => {
+            (useStore.getState() as any).updateNodeData(outputNode.id, {
+              isStreaming: false,
+              streamedContent: "",
+            });
             (useStore.getState() as any).updateNodeStatus(
               outputNode.id,
-              "error"
+              "error",
+              `LLM error: ${error}`
             );
-          }
-          reject(new Error(error));
+          });
+          reject(new Error(`LLM invocation failed: ${error}`));
         },
       });
     });
