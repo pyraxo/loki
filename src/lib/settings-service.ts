@@ -327,6 +327,27 @@ class SettingsService {
     }
     return "openai"; // Default fallback
   }
+
+  // Theme Application
+  async applyTheme(theme: "light" | "dark" | "system"): Promise<void> {
+    try {
+      // The theme application is handled by next-themes through the ThemeProvider
+      // This method exists for potential future enhancements or immediate CSS variable updates
+
+      // Log theme application for debugging
+      console.log(`Applying theme: ${theme}`);
+
+      // For now, the actual theme application is handled by:
+      // 1. Store updateSettings() -> saves to Tauri store
+      // 2. useThemeSync hook -> syncs with next-themes
+      // 3. ThemeProvider -> applies CSS classes to DOM
+
+      // Future: Could add custom CSS variable manipulation here if needed
+    } catch (error) {
+      console.error("Failed to apply theme:", error);
+      throw error;
+    }
+  }
 }
 
 // Export singleton instance

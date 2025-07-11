@@ -16,7 +16,7 @@ export default function LeftSidebar() {
 
       <SidebarContent className="p-0">
         <Tabs defaultValue="sessions" className="h-full flex flex-col">
-          <div className="px-4 pt-4">
+          <div className="px-4 pt-8">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="sessions">Sessions</TabsTrigger>
               <TabsTrigger value="nodes">Nodes</TabsTrigger>

@@ -57,17 +57,6 @@ export default function SessionItem({
     }
   };
 
-  const getStatusIcon = (status: SessionStatus) => {
-    switch (status) {
-      case SessionStatus.RUNNING:
-        return <Play className="h-3 w-3" />;
-      case SessionStatus.ERROR:
-        return <AlertCircle className="h-3 w-3" />;
-      default:
-        return null;
-    }
-  };
-
   const handleDelete = async () => {
     setShowDeleteDialog(true);
   };
@@ -148,11 +137,6 @@ export default function SessionItem({
                   session.metadata.status
                 )}`}
               />
-              {getStatusIcon(session.metadata.status) && (
-                <div className="absolute -top-1 -right-1">
-                  {getStatusIcon(session.metadata.status)}
-                </div>
-              )}
             </div>
 
             {/* Session Content */}

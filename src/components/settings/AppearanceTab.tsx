@@ -17,10 +17,10 @@ import { useStore } from "@/lib/store";
 import { type ThemeMode } from "@/types/settings";
 
 export default function AppearanceTab() {
-  const { settings, updateSettings } = useStore();
+  const { settings, setTheme } = useStore();
 
   const handleThemeChange = async (theme: ThemeMode) => {
-    await updateSettings({ theme });
+    await setTheme(theme);
   };
 
   return (

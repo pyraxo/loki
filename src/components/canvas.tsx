@@ -30,8 +30,6 @@ import {
   Background,
   addEdge,
   BackgroundVariant,
-  type Node,
-  type Edge,
   type NodeChange,
   type EdgeChange,
   type Connection,
@@ -462,7 +460,7 @@ export default function Canvas() {
               fitView
             >
               <Controls />
-              <MiniMap />
+              <MiniMap zoomable pannable nodeStrokeWidth={3} />
               <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
             </ReactFlow>
           </div>

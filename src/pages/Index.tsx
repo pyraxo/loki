@@ -8,12 +8,16 @@ import {
   useSessionShortcuts,
   useUnsavedChangesWarning,
 } from "@/lib/session-utils";
+import { useThemeSync } from "@/hooks/use-theme-sync";
 
 export default function Index() {
   // Enable session management features
   useAutoSave(30000); // Auto-save every 30 seconds
   useSessionShortcuts(); // Keyboard shortcuts
   useUnsavedChangesWarning(); // Warn about unsaved changes
+
+  // Enable theme synchronization
+  useThemeSync(); // Sync themes between next-themes and store
 
   return (
     <SidebarProvider className="flex flex-col">

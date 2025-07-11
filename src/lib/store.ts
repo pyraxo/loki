@@ -14,6 +14,7 @@ import {
   type AppSettings,
   type LLMProvider,
   type ProviderSettings,
+  type ThemeMode,
   createDefaultSettings,
 } from "@/types/settings";
 import { sessionService } from "./session-service";
@@ -104,6 +105,7 @@ interface CanvasState {
   markSessionAsUnsaved: (sessionId?: string) => void;
   markSessionAsRunning: (sessionId?: string) => void;
   markSessionAsError: (sessionId: string, error: string) => void;
+  markSessionAsCompleted: (sessionId: string) => void;
 
   // Search and filtering
   setSearchQuery: (query: string) => void;
@@ -145,6 +147,10 @@ interface CanvasState {
   setApiKey: (provider: LLMProvider, apiKey: string) => Promise<void>;
   getApiKey: (provider: LLMProvider) => Promise<string | null>;
 
+  // Theme actions
+  setTheme: (theme: ThemeMode) => Promise<void>;
+  initializeTheme: () => Promise<void>;
+
   // Settings dialog actions
   openSettingsDialog: (tab?: string) => void;
   closeSettingsDialog: () => void;
@@ -156,6 +162,9 @@ interface CanvasState {
 
   // Initialization
   initializeStore: () => Promise<void>;
+
+  // Helper methods
+  checkWorkflowCompletion: () => void;
 }
 
 export const useStore = create<CanvasState>((set, get) => ({
@@ -271,7 +280,13 @@ export const useStore = create<CanvasState>((set, get) => ({
   },
 
   stopWorkflow: () => {
-    const { workflow } = get();
+    const { workflow, activeSessionId } = get();
+
+    // Only proceed if workflow is actually running
+    if (!workflow.isRunning) {
+      return;
+    }
+
     set({
       workflow: {
         ...workflow,
@@ -280,9 +295,27 @@ export const useStore = create<CanvasState>((set, get) => ({
       },
     });
 
-    const { activeSessionId } = get();
+    // If workflow is being stopped manually and session isn't already in error state,
+    // mark as saved (assuming no unsaved changes from the workflow execution itself)
     if (activeSessionId) {
-      get().updateSessionMetadata(activeSessionId, { isRunning: false }, false);
+      const hasErrors = workflow.errorNodes.length > 0;
+      if (!hasErrors) {
+        get().updateSessionMetadata(
+          activeSessionId,
+          {
+            isRunning: false,
+            status: SessionStatus.SAVED,
+          },
+          false
+        );
+      } else {
+        // Just mark as not running if there were errors (status already set to ERROR)
+        get().updateSessionMetadata(
+          activeSessionId,
+          { isRunning: false },
+          false
+        );
+      }
     }
   },
 
@@ -295,6 +328,9 @@ export const useStore = create<CanvasState>((set, get) => ({
         currentNode: undefined,
       },
     });
+
+    // Check if this completed the entire workflow
+    get().checkWorkflowCompletion();
   },
 
   markNodeError: (nodeId: string, error: string) => {
@@ -586,6 +622,58 @@ export const useStore = create<CanvasState>((set, get) => ({
     ); // Don't update timestamp for status changes
   },
 
+  // Mark session as completed (successful workflow execution)
+  markSessionAsCompleted: (sessionId: string) => {
+    get().updateSessionMetadata(
+      sessionId,
+      {
+        isRunning: false,
+        status: SessionStatus.SAVED,
+      },
+      false
+    ); // Don't update timestamp for status changes
+  },
+
+  // Helper method to check if workflow is completed
+  checkWorkflowCompletion: () => {
+    const { workflow, nodes, activeSessionId } = get();
+
+    if (!workflow.isRunning || !activeSessionId) {
+      return;
+    }
+
+    // Get all nodes that should be executed
+    const executableNodes = nodes.filter((node) => {
+      // All nodes are considered executable in this implementation
+      return true;
+    });
+
+    const totalExecutableNodes = executableNodes.length;
+    const completedNodesCount = workflow.completedNodes.length;
+    const errorNodesCount = workflow.errorNodes.length;
+
+    // Check if all nodes are either completed or errored
+    const allNodesProcessed =
+      completedNodesCount + errorNodesCount >= totalExecutableNodes;
+
+    if (allNodesProcessed) {
+      // Stop the workflow state
+      set({
+        workflow: {
+          ...workflow,
+          isRunning: false,
+          currentNode: undefined,
+        },
+      });
+
+      // If there are no error nodes, mark as completed successfully
+      if (errorNodesCount === 0) {
+        get().markSessionAsCompleted(activeSessionId);
+      }
+      // If there are error nodes, the session should already be marked as error by markNodeError
+    }
+  },
+
   // Search and filtering
   setSearchQuery: (query: string) => {
     set({ searchQuery: query });
@@ -798,6 +886,34 @@ export const useStore = create<CanvasState>((set, get) => ({
     } catch (error) {
       console.error("Failed to get API key:", error);
       return null;
+    }
+  },
+
+  // Theme actions
+  setTheme: async (theme: ThemeMode) => {
+    try {
+      // Update settings which will persist the theme
+      await get().updateSettings({ theme });
+
+      // The actual DOM theme application will be handled by the useThemeSync hook
+      console.log(`Theme set to: ${theme}`);
+    } catch (error) {
+      console.error("Failed to set theme:", error);
+      throw error;
+    }
+  },
+
+  initializeTheme: async () => {
+    try {
+      // Import theme service
+      const { themeService } = await import("@/lib/theme-service");
+
+      // Initialize the theme service
+      await themeService.initializeTheme();
+
+      console.log("Theme initialized");
+    } catch (error) {
+      console.error("Failed to initialize theme:", error);
     }
   },
 

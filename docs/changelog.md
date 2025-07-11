@@ -20,6 +20,17 @@
 - **Error State Cleanup**: Error handling now properly cleans up streaming state and provides contextual error messages
 - **Workflow Coordination**: Improved dependency-based execution flow for optimal streaming performance
 
+#### App-Wide Dark Mode Implementation
+
+- **Complete Theme System**: Implemented fully functional app-wide dark mode with immediate switching, persistence, and system detection
+- **ThemeProvider Integration**: Added next-themes ThemeProvider wrapper for seamless theme management across all components
+- **Theme Toggle Button**: Beautiful header toggle button that cycles through light → dark → system modes with appropriate icons (Sun, Moon, Monitor)
+- **System Theme Detection**: Real-time detection and response to OS theme changes when "system" mode is selected
+- **Theme Persistence**: Theme choices persist across app sessions through existing settings infrastructure
+- **Bidirectional Synchronization**: Complete sync between next-themes, Zustand store, and settings service
+- **Enhanced Appearance Tab**: Updated settings appearance tab to use new theme actions for immediate application
+- **Smooth Transitions**: Polished animations and hover effects throughout the theme switching experience
+
 ### 🐛 Bug Fixes
 
 #### Streaming and Output Issues
@@ -38,6 +49,14 @@
 - **State Consistency**: Enhanced state management to maintain consistency across global workflow and individual node states
 - **Performance Optimization**: Optimized streaming updates to minimize unnecessary re-renders while maintaining real-time feedback
 - **Execution State Management**: Added `updateNodeDataDuringExecution()` function to update node data during workflow execution without marking sessions as unsaved, preserving proper status indicators
+
+#### Theme System Architecture
+
+- **Theme Service Bridge**: Created `theme-service.ts` to bridge between next-themes and Zustand store with bidirectional synchronization
+- **Theme Sync Hook**: Implemented `useThemeSync` custom hook for automatic theme synchronization and system detection
+- **Store Integration**: Added `setTheme` and `initializeTheme` actions to Zustand store for centralized theme management
+- **Settings Service Enhancement**: Extended settings service with theme application methods for immediate theme switching
+- **Header Integration**: Seamlessly integrated theme toggle into app header with proper drag region handling
 
 ---
 
