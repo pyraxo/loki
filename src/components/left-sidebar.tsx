@@ -2,10 +2,12 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SessionList from "./session/SessionList";
 import NodeLibrary from "./session/NodeLibrary";
+import SidebarFooterComponent from "@/components/sidebar-footer";
 
 export default function LeftSidebar() {
   return (
@@ -32,6 +34,10 @@ export default function LeftSidebar() {
           </div>
         </Tabs>
       </SidebarContent>
+
+      <SidebarFooter className="p-0">
+        <SidebarFooterComponent />
+      </SidebarFooter>
     </Sidebar>
   );
 }

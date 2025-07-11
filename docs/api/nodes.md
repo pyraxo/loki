@@ -310,9 +310,30 @@ Start Node → Text Prompt Node → LLM Invocation Node A → Output Node A
 
 ### Node Registration
 
-All nodes are registered in the `nodeTypes` export:
+Nodes are organized in the `src/components/nodes/` directory with individual component files and a centralized export system:
+
+**File Structure:**
+
+```
+src/components/nodes/
+├── index.tsx          # Central node registration and exports
+├── BaseNode.tsx       # Shared base node functionality
+├── StartNode.tsx      # Start node implementation
+├── TextNode.tsx       # Text prompt node implementation
+├── LLMNode.tsx        # LLM invocation node implementation
+└── OutputNode.tsx     # Output/viewer node implementation
+```
+
+**Registration System:**
+All nodes are registered in `src/components/nodes/index.tsx`:
 
 ```typescript
+import { NodeType } from "@/types/nodes";
+import { StartNode } from "@/components/nodes/StartNode";
+import { TextPromptNode } from "@/components/nodes/TextNode";
+import { LLMInvocationNode } from "@/components/nodes/LLMNode";
+import { OutputNode } from "@/components/nodes/OutputNode";
+
 export const nodeTypes = {
   [NodeType.START]: StartNode,
   [NodeType.TEXT_PROMPT]: TextPromptNode,
@@ -320,6 +341,12 @@ export const nodeTypes = {
   [NodeType.OUTPUT]: OutputNode,
 };
 ```
+
+This centralized approach makes it easy to add new node types by:
+
+1. Creating the component file in `src/components/nodes/`
+2. Adding the import and registration in `index.tsx`
+3. Defining the node type in `@/types/nodes`
 
 ### Styling Conventions
 

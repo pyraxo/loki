@@ -1,8 +1,10 @@
-import { streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { streamText } from "ai";
+import { openai, createOpenAI } from "@ai-sdk/openai";
+import { settingsService } from "./settings-service";
+import { type LLMProvider, PROVIDER_METADATA } from "@/types/settings";
 
 export interface LLMParams {
-  model: 'gpt-4' | 'gpt-3.5-turbo' | 'claude-3-haiku' | 'claude-3-sonnet';
+  model: "gpt-4" | "gpt-3.5-turbo" | "claude-3-haiku" | "claude-3-sonnet";
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
@@ -15,23 +17,48 @@ export interface StreamingCallbacks {
   onError: (error: string) => void;
 }
 
-// Map our model names to provider-specific models
-const getProviderModel = (model: string) => {
-  switch (model) {
-    case 'gpt-4':
-      return openai('gpt-4');
-    case 'gpt-3.5-turbo':
-      return openai('gpt-3.5-turbo');
-    case 'claude-3-haiku':
-      // Note: Would need @ai-sdk/anthropic for Claude
+// Get provider client with configurable API keys
+const getProviderClient = async (model: string) => {
+  const provider = settingsService.getProviderFromModel(model);
+  const apiKey = await settingsService.getApiKey(provider);
+
+  if (!apiKey && PROVIDER_METADATA[provider].requiresApiKey) {
+    throw new Error(
+      `API key not configured for ${PROVIDER_METADATA[provider].name}`
+    );
+  }
+
+  switch (provider) {
+    case "openai":
+      const openaiClient = createOpenAI({ apiKey: apiKey || undefined });
+      return openaiClient(model);
+    case "anthropic":
+      // TODO: Add @ai-sdk/anthropic for Claude support
       // For now, fallback to OpenAI
-      return openai('gpt-3.5-turbo');
-    case 'claude-3-sonnet':
-      // Note: Would need @ai-sdk/anthropic for Claude
-      // For now, fallback to OpenAI
-      return openai('gpt-4');
+      console.warn(
+        `Provider ${provider} not yet supported, falling back to OpenAI`
+      );
+      const openaiKey = await settingsService.getApiKey("openai");
+      if (!openaiKey) {
+        throw new Error("OpenAI API key not configured for fallback");
+      }
+      const fallbackClient = createOpenAI({ apiKey: openaiKey });
+      return fallbackClient("gpt-3.5-turbo");
+    case "google":
+    case "cohere":
+    case "ollama":
+      // TODO: Add support for other providers
+      console.warn(
+        `Provider ${provider} not yet supported, falling back to OpenAI`
+      );
+      const fallbackKey = await settingsService.getApiKey("openai");
+      if (!fallbackKey) {
+        throw new Error("OpenAI API key not configured for fallback");
+      }
+      const fallbackClientOther = createOpenAI({ apiKey: fallbackKey });
+      return fallbackClientOther("gpt-3.5-turbo");
     default:
-      return openai('gpt-3.5-turbo');
+      throw new Error(`Unknown provider: ${provider}`);
   }
 };
 
@@ -44,7 +71,7 @@ export class LLMService {
     try {
       callbacks.onStart();
 
-      const model = getProviderModel(params.model);
+      const model = await getProviderClient(params.model);
 
       const result = await streamText({
         model,
@@ -54,7 +81,7 @@ export class LLMService {
         ...(params.systemPrompt && { system: params.systemPrompt }),
       });
 
-      let fullContent = '';
+      let fullContent = "";
 
       for await (const delta of result.textStream) {
         fullContent += delta;
@@ -64,10 +91,10 @@ export class LLMService {
       // Get final usage stats if available
       const usage = await result.usage;
       callbacks.onComplete(fullContent, usage?.totalTokens);
-
     } catch (error) {
-      console.error('LLM Service Error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error("LLM Service Error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       callbacks.onError(errorMessage);
     }
   }
@@ -77,7 +104,7 @@ export class LLMService {
     params: LLMParams
   ): Promise<{ content: string; tokenCount?: number }> {
     try {
-      const model = getProviderModel(params.model);
+      const model = await getProviderClient(params.model);
 
       const result = await streamText({
         model,
@@ -87,7 +114,7 @@ export class LLMService {
         ...(params.systemPrompt && { system: params.systemPrompt }),
       });
 
-      let fullContent = '';
+      let fullContent = "";
       for await (const delta of result.textStream) {
         fullContent += delta;
       }
@@ -97,10 +124,11 @@ export class LLMService {
         content: fullContent,
         tokenCount: usage?.totalTokens,
       };
-
     } catch (error) {
-      console.error('LLM Service Error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Unknown error occurred');
+      console.error("LLM Service Error:", error);
+      throw new Error(
+        error instanceof Error ? error.message : "Unknown error occurred"
+      );
     }
   }
-} 
+}

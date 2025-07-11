@@ -2,7 +2,40 @@
 
 ## [Unreleased] - 2025-01-25
 
+### ✨ Major Features Added
+
+#### Settings Management System
+
+- **Sidebar Footer**: Added settings footer component at bottom of left sidebar with theme indicator and provider status
+- **Comprehensive Settings Dialog**: Implemented tabbed settings interface with four main sections:
+  - **Providers Tab**: LLM provider configuration with secure API key management
+  - **Appearance Tab**: Theme selection (light/dark/system)
+  - **Preferences Tab**: Auto-save intervals and default model parameters
+  - **Advanced Tab**: Settings export/import and reset functionality
+- **Secure API Key Storage**: API keys stored using Tauri's secure store with encryption
+- **Provider Management**: Support for OpenAI (active), Anthropic, Google, Cohere, and Ollama (future)
+- **Settings Persistence**: Non-sensitive settings stored locally with export/import capability
+- **Provider Status Indicators**: Visual status dots showing provider configuration state
+
+#### Enhanced LLM Service
+
+- **Configurable Providers**: Refactored LLM service to use settings-based API key configuration
+- **Secure API Integration**: API keys loaded from secure storage for each request
+- **Provider Fallback**: Graceful fallback to OpenAI for unsupported providers
+- **Better Error Handling**: Clear error messages for missing API keys and provider issues
+
 ### 🐛 Bug Fixes
+
+#### API Key Storage Issue
+
+- **Fixed API Key Validation**: Resolved issue where OpenAI API keys weren't being saved due to overly restrictive validation pattern
+- **Root Cause**: The OpenAI API key pattern was expecting exactly 48 characters, but modern OpenAI API keys have variable lengths
+- **Solution**: Updated pattern from `/^sk-[a-zA-Z0-9]{48}$/` to `/^sk-[a-zA-Z0-9]{20,}$/` to accept at least 20 characters after the `sk-` prefix
+- **Enhanced User Feedback**: Added loading states, success messages, and clear error messages for API key saving operations
+- **Improved Error Handling**: Better error messages and visual feedback throughout the provider settings interface
+- **Removed Restrictive Format Validation**: Eliminated API key format patterns in favor of actual connection testing
+- **Real Connection Testing**: Implemented actual API connection testing for OpenAI to validate keys by making real API calls
+- **User-Friendly Validation**: API keys are now validated by testing if they actually work, not by arbitrary format rules
 
 #### Session Loading Issue
 
@@ -84,16 +117,26 @@
 #### New Files
 
 - `src/types/sessions.ts` - Session type definitions and interfaces
+- `src/types/settings.ts` - Settings type definitions and provider metadata
 - `src/lib/session-service.ts` - Session persistence service
+- `src/lib/settings-service.ts` - Settings persistence and secure API key management
 - `src/lib/session-utils.ts` - Session management utilities and hooks
 - `src/components/session/SessionList.tsx` - Session list component
 - `src/components/session/SessionItem.tsx` - Individual session item component
 - `src/components/session/SessionSearch.tsx` - Session search component
 - `src/components/session/NodeLibrary.tsx` - Node library component
+- `src/components/sidebar-footer.tsx` - Settings footer component
+- `src/components/settings/SettingsDialog.tsx` - Main settings dialog component
+- `src/components/settings/ProviderSettingsTab.tsx` - LLM provider configuration tab
+- `src/components/settings/AppearanceTab.tsx` - Theme and UI settings tab
+- `src/components/settings/PreferencesTab.tsx` - Auto-save and defaults tab
+- `src/components/settings/AdvancedTab.tsx` - Export/import and advanced settings tab
+- `src/components/ui/switch.tsx` - Switch component for toggles
 - `src/components/ui/confirmation-dialog.tsx` - Global confirmation dialog component
 - `src/components/ui/rename-dialog.tsx` - Global rename dialog component
 - `docs/plans/090725-sidebar-plan.md` - Implementation plan documentation
 - `docs/plans/250125-shadcn-context-menu-migration.md` - Context menu migration plan
+- `docs/plans/100725-settings-footer-plan.md` - Settings footer implementation plan
 
 #### Removed Files
 
@@ -101,8 +144,10 @@
 
 #### Modified Files
 
-- `src/lib/store.ts` - Enhanced with session management capabilities
-- `src/components/left-sidebar.tsx` - Replaced with tabbed interface
+- `src/lib/store.ts` - Enhanced with session management and settings state capabilities
+- `src/lib/llm-service.ts` - Refactored to use configurable API keys from settings
+- `src/components/left-sidebar.tsx` - Added sidebar footer with settings access
+- `src/components/App.tsx` - Integrated settings dialog into global dialogs
 - `src/pages/Index.tsx` - Integrated session management utilities
 - `src/components/canvas.tsx` - Migrated to shadcn ContextMenu with keyboard shortcuts
 - `src/components/session/SessionItem.tsx` - Replaced DropdownMenu with ContextMenu

@@ -10,6 +10,7 @@ import {
   GitBranch,
   Timer,
   Merge,
+  Plus,
 } from "lucide-react";
 import {
   ContextMenu,
@@ -20,6 +21,7 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { Button } from "@/components/ui/button";
 
 import {
   ReactFlow,
@@ -177,6 +179,8 @@ export default function Canvas() {
     setEdgesInternal,
     activeSessionId,
     isLoading,
+    createSession,
+    loadSession,
   } = useStore();
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -402,6 +406,40 @@ export default function Canvas() {
     [edges, setEdges]
   );
 
+  // Handle creating a new session and loading it
+  const handleCreateSession = async () => {
+    try {
+      const sessionId = await createSession();
+      await loadSession(sessionId);
+    } catch (error) {
+      console.error("Failed to create session:", error);
+    }
+  };
+
+  // If no session is selected, show placeholder
+  if (!activeSessionId && !isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full pb-16 pl-16">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="mb-6">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/30 flex items-center justify-center">
+              <MessageSquare className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">no session selected</h2>
+            <p className="text-muted-foreground text-sm">
+              select a session from the sidebar to start building your workflow,
+              or create a new one to get started.
+            </p>
+          </div>
+          <Button onClick={handleCreateSession} className="gap-2">
+            <Plus className="w-4 h-4" />
+            create new session
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // Group nodes by category for context menu
   const nodesByCategory = CATEGORIES.map((category) => ({
     ...category,
@@ -409,7 +447,7 @@ export default function Canvas() {
   })).filter((category) => category.nodes.length > 0);
 
   return (
-    <div ref={canvasRef} className="relative w-full h-full">
+    <div ref={canvasRef} className="relative w-full pl-16 h-full">
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div className="w-full h-full">

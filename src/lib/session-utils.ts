@@ -346,9 +346,7 @@ export function useUnsavedChangesWarning() {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (hasUnsavedChanges) {
         event.preventDefault();
-        event.returnValue =
-          "You have unsaved changes. Are you sure you want to leave?";
-        return event.returnValue;
+        return "You have unsaved changes. Are you sure you want to leave?";
       }
     };
 

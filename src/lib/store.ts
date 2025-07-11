@@ -10,7 +10,14 @@ import {
   type SessionMetadata,
   SessionStatus,
 } from "@/types/sessions";
+import {
+  type AppSettings,
+  type LLMProvider,
+  type ProviderSettings,
+  createDefaultSettings,
+} from "@/types/settings";
 import { sessionService } from "./session-service";
+import { settingsService } from "./settings-service";
 
 interface CanvasState {
   // React Flow state
@@ -44,6 +51,16 @@ interface CanvasState {
     title: string;
     currentValue: string;
     onConfirm: ((newName: string) => void) | null;
+  };
+
+  // Settings state
+  settings: AppSettings;
+  settingsLoaded: boolean;
+
+  // Settings dialog state
+  settingsDialog: {
+    isOpen: boolean;
+    activeTab: string;
   };
 
   // Canvas actions
@@ -115,6 +132,24 @@ interface CanvasState {
   ) => void;
   hideRenameDialog: () => void;
 
+  // Settings actions
+  updateSettings: (settings: Partial<AppSettings>) => Promise<void>;
+  updateProviderSettings: (
+    provider: LLMProvider,
+    settings: Partial<ProviderSettings>
+  ) => Promise<void>;
+  setApiKey: (provider: LLMProvider, apiKey: string) => Promise<void>;
+  getApiKey: (provider: LLMProvider) => Promise<string | null>;
+
+  // Settings dialog actions
+  openSettingsDialog: (tab?: string) => void;
+  closeSettingsDialog: () => void;
+
+  // Settings export/import
+  exportSettings: () => Promise<string>;
+  importSettings: (data: string) => Promise<void>;
+  resetSettings: () => Promise<void>;
+
   // Initialization
   initializeStore: () => Promise<void>;
 }
@@ -154,6 +189,16 @@ export const useStore = create<CanvasState>((set, get) => ({
     title: "",
     currentValue: "",
     onConfirm: null,
+  },
+
+  // Initial settings state
+  settings: createDefaultSettings(),
+  settingsLoaded: false,
+
+  // Initial settings dialog state
+  settingsDialog: {
+    isOpen: false,
+    activeTab: "providers",
   },
 
   // Canvas actions
@@ -684,12 +729,130 @@ export const useStore = create<CanvasState>((set, get) => ({
     });
   },
 
+  // Settings actions
+  updateSettings: async (settingsUpdate: Partial<AppSettings>) => {
+    try {
+      const { settings } = get();
+      const newSettings = { ...settings, ...settingsUpdate };
+
+      await settingsService.saveSettings(newSettings);
+      set({ settings: newSettings });
+    } catch (error) {
+      console.error("Failed to update settings:", error);
+      throw error;
+    }
+  },
+
+  updateProviderSettings: async (
+    provider: LLMProvider,
+    providerSettings: Partial<ProviderSettings>
+  ) => {
+    try {
+      await settingsService.updateProviderSettings(provider, providerSettings);
+
+      const { settings } = get();
+      const newSettings = {
+        ...settings,
+        providers: {
+          ...settings.providers,
+          [provider]: {
+            ...settings.providers[provider],
+            ...providerSettings,
+          },
+        },
+      };
+
+      set({ settings: newSettings });
+    } catch (error) {
+      console.error("Failed to update provider settings:", error);
+      throw error;
+    }
+  },
+
+  setApiKey: async (provider: LLMProvider, apiKey: string) => {
+    try {
+      await settingsService.saveApiKey(provider, apiKey);
+      // Note: API keys are not stored in the settings state for security
+    } catch (error) {
+      console.error("Failed to save API key:", error);
+      throw error;
+    }
+  },
+
+  getApiKey: async (provider: LLMProvider) => {
+    try {
+      return await settingsService.getApiKey(provider);
+    } catch (error) {
+      console.error("Failed to get API key:", error);
+      return null;
+    }
+  },
+
+  // Settings dialog actions
+  openSettingsDialog: (tab: string = "providers") => {
+    set({
+      settingsDialog: {
+        isOpen: true,
+        activeTab: tab,
+      },
+    });
+  },
+
+  closeSettingsDialog: () => {
+    set({
+      settingsDialog: {
+        isOpen: false,
+        activeTab: "providers",
+      },
+    });
+  },
+
+  // Settings export/import
+  exportSettings: async () => {
+    try {
+      return await settingsService.exportSettings();
+    } catch (error) {
+      console.error("Failed to export settings:", error);
+      throw error;
+    }
+  },
+
+  importSettings: async (data: string) => {
+    try {
+      await settingsService.importSettings(data);
+      const settings = await settingsService.loadSettings();
+      set({ settings });
+    } catch (error) {
+      console.error("Failed to import settings:", error);
+      throw error;
+    }
+  },
+
+  resetSettings: async () => {
+    try {
+      await settingsService.resetSettings();
+      const settings = await settingsService.loadSettings();
+      set({ settings });
+    } catch (error) {
+      console.error("Failed to reset settings:", error);
+      throw error;
+    }
+  },
+
   // Initialization
   initializeStore: async () => {
     set({ isLoading: true, error: null });
 
     try {
+      // Initialize services
       await sessionService.initialize();
+      await settingsService.initialize();
+
+      // Load settings
+      const settings = await settingsService.loadSettings();
+      set({ settings, settingsLoaded: true });
+
+      // Load sessions
       await get().refreshSessions();
 
       // Create default session if no sessions exist
