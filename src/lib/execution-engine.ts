@@ -98,10 +98,13 @@ export class ExecutionEngine {
 
           // Only update content if not connected to LLM (to preserve streaming content)
           if (!hasLLMInput && inputText.trim()) {
-            (useStore.getState() as any).updateNodeData(node.id, {
-              content: inputText,
-              isStreaming: false,
-            });
+            (useStore.getState() as any).updateNodeDataDuringExecution(
+              node.id,
+              {
+                content: inputText,
+                isStreaming: false,
+              }
+            );
           }
           (useStore.getState() as any).updateNodeStatus(node.id, "success");
           break;
@@ -149,11 +152,14 @@ export class ExecutionEngine {
         onStart: () => {
           // Stream to ALL connected output nodes
           connectedOutputNodes.forEach((outputNode) => {
-            (useStore.getState() as any).updateNodeData(outputNode.id, {
-              isStreaming: true,
-              streamedContent: "",
-              tokenCount: undefined, // Clear any previous token count
-            });
+            (useStore.getState() as any).updateNodeDataDuringExecution(
+              outputNode.id,
+              {
+                isStreaming: true,
+                streamedContent: "",
+                tokenCount: undefined, // Clear any previous token count
+              }
+            );
             (useStore.getState() as any).updateNodeStatus(
               outputNode.id,
               "running"
@@ -164,9 +170,12 @@ export class ExecutionEngine {
         onContent: (content: string) => {
           // Broadcast identical content to ALL connected output nodes
           connectedOutputNodes.forEach((outputNode) => {
-            (useStore.getState() as any).updateNodeData(outputNode.id, {
-              streamedContent: content,
-            });
+            (useStore.getState() as any).updateNodeDataDuringExecution(
+              outputNode.id,
+              {
+                streamedContent: content,
+              }
+            );
           });
         },
 
@@ -175,12 +184,15 @@ export class ExecutionEngine {
 
           // Update ALL connected output nodes with final content
           connectedOutputNodes.forEach((outputNode) => {
-            (useStore.getState() as any).updateNodeData(outputNode.id, {
-              content: finalContent,
-              isStreaming: false,
-              streamedContent: "",
-              tokenCount,
-            });
+            (useStore.getState() as any).updateNodeDataDuringExecution(
+              outputNode.id,
+              {
+                content: finalContent,
+                isStreaming: false,
+                streamedContent: "",
+                tokenCount,
+              }
+            );
             (useStore.getState() as any).updateNodeStatus(
               outputNode.id,
               "success"
@@ -200,10 +212,13 @@ export class ExecutionEngine {
 
           // Propagate error to ALL connected output nodes
           connectedOutputNodes.forEach((outputNode) => {
-            (useStore.getState() as any).updateNodeData(outputNode.id, {
-              isStreaming: false,
-              streamedContent: "",
-            });
+            (useStore.getState() as any).updateNodeDataDuringExecution(
+              outputNode.id,
+              {
+                isStreaming: false,
+                streamedContent: "",
+              }
+            );
             (useStore.getState() as any).updateNodeStatus(
               outputNode.id,
               "error",

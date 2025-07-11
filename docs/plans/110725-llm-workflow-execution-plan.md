@@ -195,7 +195,8 @@
 ✅ **Content Preservation**: Output nodes preserve previous content until new streaming data arrives  
 ✅ **Enhanced Error Handling**: Errors propagate to all connected outputs with cleanup and better messages  
 ✅ **Coordinated Status**: Global workflow state and individual node states work together seamlessly  
-✅ **Visual Feedback**: All nodes show appropriate status indicators during execution and streaming
+✅ **Visual Feedback**: All nodes show appropriate status indicators during execution and streaming  
+✅ **Session Status Preservation**: Sessions maintain "workflow running" (blue) status during execution instead of being marked as "unsaved" (yellow)
 
 ### **Technical Changes Made:**
 
@@ -205,8 +206,14 @@
    - Updated streaming callbacks to broadcast to multiple outputs via `forEach` loops
    - Enhanced error handling with state cleanup and better error messages
    - Improved output node execution logic to preserve content when connected to LLM nodes
+   - Updated to use `updateNodeDataDuringExecution()` to preserve workflow running status
 
-2. **Streaming Flow**:
+2. **`src/lib/store.ts`**:
+
+   - Added `updateNodeDataDuringExecution()` function for execution-time updates that don't mark sessions as unsaved
+   - Preserves "workflow running" (blue) status during execution instead of marking as "unsaved" (yellow)
+
+3. **Streaming Flow**:
    - `onStart`: Initializes streaming state on all connected output nodes
    - `onContent`: Broadcasts identical streamed content to all outputs
    - `onComplete`: Updates all outputs with final content and token counts

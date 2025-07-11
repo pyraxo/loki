@@ -28,6 +28,7 @@
 - **Fixed Content Clearing**: Eliminated unwanted content clearing on workflow restart - content now persists until new data arrives
 - **Fixed Error Propagation**: Errors now properly propagate to all connected output nodes with appropriate cleanup
 - **Enhanced Stream Coordination**: Multiple output nodes now show synchronized streaming indicators and content
+- **Fixed Session Status During Execution**: Resolved issue where streaming updates marked sessions as "unsaved" (yellow) instead of preserving "workflow running" (blue) status
 
 ### 🏗️ Technical Improvements
 
@@ -36,10 +37,11 @@
 - **Stream Fanout**: Implemented proper stream broadcasting to multiple output nodes
 - **State Consistency**: Enhanced state management to maintain consistency across global workflow and individual node states
 - **Performance Optimization**: Optimized streaming updates to minimize unnecessary re-renders while maintaining real-time feedback
+- **Execution State Management**: Added `updateNodeDataDuringExecution()` function to update node data during workflow execution without marking sessions as unsaved, preserving proper status indicators
 
 ---
 
-## [Previous] - 2025-01-25
+## [Previous] - 2025-07-10
 
 ### ✨ Major Features Added
 
@@ -217,6 +219,25 @@ Sessions now display status indicators:
 - **Type-safe** session management throughout
 - **Auto-save** and **keyboard shortcuts** implemented
 - **Export/Import** functionality with validation
+
+### 📚 API Documentation
+
+#### Comprehensive Documentation Suite
+
+- **Store API Documentation**: Complete documentation for Zustand store including state management, actions, and usage patterns
+- **Services API Documentation**: Comprehensive coverage of all services including execution engine, LLM service, session service, and settings service
+- **Utilities API Documentation**: Detailed documentation for session utilities, custom hooks, and general utilities
+- **Usage Examples**: Real-world code examples and integration patterns throughout all documentation
+- **Type Safety Coverage**: Full TypeScript interface documentation with type examples and patterns
+
+#### Documentation Features
+
+- **Complete API Coverage**: Every public method, property, and interface documented
+- **Usage Examples**: Practical code examples for all major features
+- **Error Handling**: Comprehensive error handling documentation and patterns
+- **Performance Notes**: Performance considerations and optimization guidelines
+- **Integration Patterns**: How components and services work together
+- **Developer Experience**: IDE support, type safety, and development workflows
 
 #### Integration Points
 

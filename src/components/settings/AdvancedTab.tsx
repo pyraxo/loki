@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Download, Upload, RefreshCw, AlertTriangle } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function AdvancedTab() {
   const { exportSettings, importSettings, resetSettings } = useStore();
@@ -80,106 +81,108 @@ export default function AdvancedTab() {
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Export & Import</CardTitle>
-          <CardDescription>
-            Backup and restore your settings. API keys are not included for
-            security.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleExportSettings}
-              disabled={isExporting}
-              className="flex-1"
-            >
-              {isExporting ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4 mr-2" />
-              )}
-              Export Settings
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={handleImportSettings}
-              disabled={isImporting}
-              className="flex-1"
-            >
-              {isImporting ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Upload className="h-4 w-4 mr-2" />
-              )}
-              Import Settings
-            </Button>
-          </div>
-
-          <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md">
-            <strong>Note:</strong> Exported settings do not include API keys for
-            security reasons. You will need to re-enter your API keys after
-            importing settings.
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
-            Danger Zone
-          </CardTitle>
-          <CardDescription>
-            Irreversible actions that affect all your settings.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <div className="font-medium">Reset All Settings</div>
-                <div className="text-sm text-muted-foreground">
-                  Reset all settings to their default values. This will also
-                  clear all API keys.
-                </div>
-              </div>
+    <ScrollArea className="h-full">
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Export & Import</CardTitle>
+            <CardDescription>
+              Backup and restore your settings. API keys are not included for
+              security.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-2">
               <Button
-                variant="destructive"
-                onClick={handleResetSettings}
-                disabled={isResetting}
+                variant="outline"
+                onClick={handleExportSettings}
+                disabled={isExporting}
+                className="flex-1"
               >
-                {isResetting ? (
+                {isExporting ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : null}
-                Reset
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                Export Settings
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleImportSettings}
+                disabled={isImporting}
+                className="flex-1"
+              >
+                {isImporting ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4 mr-2" />
+                )}
+                Import Settings
               </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Application Info</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Version:</span>
-              <Badge variant="outline">0.1.0</Badge>
+            <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md">
+              <strong>Note:</strong> Exported settings do not include API keys
+              for security reasons. You will need to re-enter your API keys
+              after importing settings.
             </div>
-            <div className="flex justify-between">
-              <span>Settings Format:</span>
-              <Badge variant="outline">v1.0.0</Badge>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-orange-500" />
+              Danger Zone
+            </CardTitle>
+            <CardDescription>
+              Irreversible actions that affect all your settings.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="pr-2">
+                  <div className="text-sm font-medium">Reset All Settings</div>
+                  <div className="text-xs text-muted-foreground">
+                    Reset all settings to their default values. This will also
+                    clear all API keys.
+                  </div>
+                </div>
+                <Button
+                  variant="destructive"
+                  onClick={handleResetSettings}
+                  disabled={isResetting}
+                >
+                  {isResetting ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : null}
+                  Reset
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Application Info</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Version:</span>
+                <Badge variant="outline">0.1.0</Badge>
+              </div>
+              <div className="flex justify-between">
+                <span>Settings Format:</span>
+                <Badge variant="outline">v1.0.0</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </ScrollArea>
   );
 }

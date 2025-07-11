@@ -69,6 +69,10 @@ interface CanvasState {
   setNodesInternal: (nodes: CustomNode[]) => void; // For React Flow internal changes
   setEdgesInternal: (edges: Edge[]) => void; // For React Flow internal changes
   updateNodeData: (nodeId: string, data: Partial<NodeData>) => void;
+  updateNodeDataDuringExecution: (
+    nodeId: string,
+    data: Partial<NodeData>
+  ) => void; // For execution updates that shouldn't mark as unsaved
   updateNodeStatus: (
     nodeId: string,
     status: "idle" | "running" | "success" | "error",
@@ -228,6 +232,15 @@ export const useStore = create<CanvasState>((set, get) => ({
     );
     set({ nodes: updatedNodes, hasUnsavedChanges: true });
     get().markSessionAsUnsaved();
+  },
+
+  updateNodeDataDuringExecution: (nodeId: string, data: Partial<NodeData>) => {
+    const { nodes } = get();
+    const updatedNodes = nodes.map((node) =>
+      node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
+    );
+    // Don't mark as unsaved during execution - preserve workflow running status
+    set({ nodes: updatedNodes });
   },
 
   updateNodeStatus: (
