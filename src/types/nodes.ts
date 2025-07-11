@@ -3,54 +3,54 @@ import { type Node } from "@xyflow/react";
 // Base node data interface
 export interface BaseNodeData {
   id: string;
-  status: 'idle' | 'running' | 'success' | 'error';
+  status: "idle" | "running" | "success" | "error";
   error?: string;
   [key: string]: unknown;
 }
 
-// Text Prompt Node
-export interface TextPromptNodeData extends BaseNodeData {
+// Define specific data types for each node
+export type TextPromptNodeData = {
   text: string;
   characterCount?: number;
-}
+} & BaseNodeData;
 
-// LLM Invocation Node
-export interface LLMInvocationNodeData extends BaseNodeData {
-  model: 'gpt-4' | 'gpt-3.5-turbo' | 'claude-3-haiku' | 'claude-3-sonnet';
+export type LLMInvocationNodeData = {
+  model: "gpt-4" | "gpt-3.5-turbo" | "claude-3-haiku" | "claude-3-sonnet";
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
-}
+} & BaseNodeData;
 
-// Output/Viewer Node
-export interface OutputNodeData extends BaseNodeData {
+export type OutputNodeData = {
   content: string;
   isStreaming: boolean;
   streamedContent?: string;
   tokenCount?: number;
-}
+} & BaseNodeData;
 
-// Start Node
-export interface StartNodeData extends BaseNodeData {
+export type StartNodeData = {
   workflowName: string;
-}
+} & BaseNodeData;
 
-// Union type for all node data
-export type NodeData = 
-  | TextPromptNodeData 
-  | LLMInvocationNodeData 
-  | OutputNodeData 
-  | StartNodeData;
+// Node types following React Flow's recommended pattern
+export type StartNode = Node<StartNodeData, "start">;
+export type TextPromptNode = Node<TextPromptNodeData, "textPrompt">;
+export type LLMInvocationNode = Node<LLMInvocationNodeData, "llmInvocation">;
+export type OutputNode = Node<OutputNodeData, "textOutput">;
 
-// Extended Node type with our data
-export type CustomNode = Node<NodeData>;
+// Union type for all custom nodes
+export type CustomNode =
+  | StartNode
+  | TextPromptNode
+  | LLMInvocationNode
+  | OutputNode;
 
 // Node types enum
 export enum NodeType {
-  TEXT_PROMPT = 'textPrompt',
-  LLM_INVOCATION = 'llmInvocation', 
-  OUTPUT = 'textOutput',
-  START = 'start'
+  TEXT_PROMPT = "textPrompt",
+  LLM_INVOCATION = "llmInvocation",
+  OUTPUT = "textOutput",
+  START = "start",
 }
 
 // Execution status for workflow
@@ -59,4 +59,4 @@ export interface WorkflowState {
   currentNode?: string;
   completedNodes: string[];
   errorNodes: string[];
-} 
+}

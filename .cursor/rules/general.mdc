@@ -4,4 +4,5 @@ alwaysApply: true
 
 # General Rules
 
-- Never run `bun` commands to test the server after implementing new changes.
+- NEVER run `bun` commands (including `bun run dev`) to test the server after implementing new changes.
+- NEVER run the development server (e.g. `npm run dev`) to test changes.

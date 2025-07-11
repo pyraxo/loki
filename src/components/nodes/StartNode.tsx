@@ -1,108 +1,64 @@
 import { Button } from "@/components/ui/button";
 import { Square, Play } from "lucide-react";
-import { NodeProps } from "@xyflow/react";
-import { StartNodeData } from "@/types/nodes";
+import { type NodeProps } from "@xyflow/react";
+import { type StartNode } from "@/types/nodes";
 import { useStore } from "@/lib/store";
-import { BaseNode } from "@/components/nodes/BaseNode";
+import { NodeWrapper } from "@/components/nodes/BaseNode";
+import { executionEngine } from "@/lib/execution-engine";
 
-// Start Node Class
-class StartNodeClass extends BaseNode<StartNodeData> {
-  private workflow: any;
-  private stopWorkflow: () => void;
+export function StartNode({ data }: NodeProps<StartNode>) {
+  const { workflow, startWorkflow, stopWorkflow } = useStore();
 
-  constructor(
-    data: StartNodeData,
-    updateNodeData: (id: string, updates: Partial<StartNodeData>) => void,
-    workflow: any,
-    stopWorkflow: () => void
-  ) {
-    super(data, updateNodeData);
-    this.workflow = workflow;
-    this.stopWorkflow = stopWorkflow;
-  }
-
-  protected getNodeIcon(): string {
-    return "🚀";
-  }
-
-  protected getNodeTitle(): string {
-    return "Start";
-  }
-
-  protected getNodeWidth(): string {
-    return "w-64";
-  }
-
-  protected getMinHeight(): string {
-    return "min-h-[120px]";
-  }
-
-  protected getStatusColor(): string {
-    return "border-green-500";
-  }
-
-  protected getHeaderBg(): string {
-    return "bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200";
-  }
-
-  protected renderTargetHandle(): JSX.Element | null {
-    return null; // Start node doesn't have target handle
-  }
-
-  private handleRun = async () => {
-    if (this.workflow.isRunning) {
-      this.stopWorkflow();
+  const handleRunClick = async () => {
+    if (workflow.isRunning) {
+      executionEngine.stopExecution();
+      stopWorkflow();
     } else {
       try {
-        const { executionEngine } = await import("@/lib/execution-engine");
+        startWorkflow();
         await executionEngine.executeWorkflow();
       } catch (error) {
         console.error("Workflow execution failed:", error);
-        this.stopWorkflow();
       }
     }
   };
 
-  protected renderContent(): JSX.Element {
-    return (
-      <>
-        <div className="text-xs text-muted-foreground mb-3">
-          {this.data.workflowName}
+  return (
+    <NodeWrapper
+      data={data}
+      icon="🚀"
+      title="Start"
+      width="w-64"
+      minHeight="min-h-[150px]"
+      hasTargetHandle={false}
+    >
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">
+            Workflow Name
+          </label>
+          <p className="text-sm font-medium mt-1">{data.workflowName}</p>
         </div>
+
         <Button
-          onClick={this.handleRun}
-          size="sm"
+          onClick={handleRunClick}
           className="w-full"
-          variant={this.workflow.isRunning ? "destructive" : "default"}
+          variant={workflow.isRunning ? "destructive" : "default"}
+          size="sm"
         >
-          {this.workflow.isRunning ? (
+          {workflow.isRunning ? (
             <>
-              <Square className="w-3 h-3 mr-1" />
+              <Square className="w-3 h-3 mr-2" />
               Stop
             </>
           ) : (
             <>
-              <Play className="w-3 h-3 mr-1" />
+              <Play className="w-3 h-3 mr-2" />
               Run All
             </>
           )}
         </Button>
-      </>
-    );
-  }
-}
-
-// React Component Wrapper for Start Node
-export function StartNode({ data }: NodeProps) {
-  const nodeData = data as StartNodeData;
-  const { workflow, stopWorkflow, updateNodeData } = useStore();
-
-  const nodeInstance = new StartNodeClass(
-    nodeData,
-    updateNodeData,
-    workflow,
-    stopWorkflow
+      </div>
+    </NodeWrapper>
   );
-
-  return nodeInstance.render();
 }

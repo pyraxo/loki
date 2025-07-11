@@ -3,7 +3,7 @@ import { type Edge } from "@xyflow/react";
 import {
   type CustomNode,
   type WorkflowState,
-  type NodeData,
+  type BaseNodeData,
 } from "@/types/nodes";
 import {
   type Session,
@@ -69,10 +69,13 @@ interface CanvasState {
   setEdges: (edges: Edge[]) => void;
   setNodesInternal: (nodes: CustomNode[]) => void; // For React Flow internal changes
   setEdgesInternal: (edges: Edge[]) => void; // For React Flow internal changes
-  updateNodeData: (nodeId: string, data: Partial<NodeData>) => void;
+  updateNodeData: (
+    nodeId: string,
+    data: Partial<BaseNodeData & Record<string, any>>
+  ) => void;
   updateNodeDataDuringExecution: (
     nodeId: string,
-    data: Partial<NodeData>
+    data: Partial<BaseNodeData & Record<string, any>>
   ) => void; // For execution updates that shouldn't mark as unsaved
   updateNodeStatus: (
     nodeId: string,
@@ -234,21 +237,26 @@ export const useStore = create<CanvasState>((set, get) => ({
     set({ edges });
   },
 
-  updateNodeData: (nodeId: string, data: Partial<NodeData>) => {
+  updateNodeData: (
+    nodeId: string,
+    data: Partial<BaseNodeData & Record<string, any>>
+  ) => {
     const { nodes } = get();
     const updatedNodes = nodes.map((node) =>
       node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
-    );
+    ) as CustomNode[];
     set({ nodes: updatedNodes, hasUnsavedChanges: true });
     get().markSessionAsUnsaved();
   },
 
-  updateNodeDataDuringExecution: (nodeId: string, data: Partial<NodeData>) => {
+  updateNodeDataDuringExecution: (
+    nodeId: string,
+    data: Partial<BaseNodeData & Record<string, any>>
+  ) => {
     const { nodes } = get();
     const updatedNodes = nodes.map((node) =>
       node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
-    );
-    // Don't mark as unsaved during execution - preserve workflow running status
+    ) as CustomNode[];
     set({ nodes: updatedNodes });
   },
 

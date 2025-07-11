@@ -1,83 +1,58 @@
-import { NodeProps } from "@xyflow/react";
-import { OutputNodeData } from "@/types/nodes";
-import { useStore } from "@/lib/store";
-import { BaseNode } from "@/components/nodes/BaseNode";
-import { Loader2 } from "lucide-react";
+import { type NodeProps } from "@xyflow/react";
+import { type OutputNode } from "@/types/nodes";
+import { NodeWrapper } from "@/components/nodes/BaseNode";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-// Output Node Class
-class OutputNodeClass extends BaseNode<OutputNodeData> {
-  protected getNodeIcon(): string {
-    return "📄";
-  }
+export function OutputNode({ data }: NodeProps<OutputNode>) {
+  const displayContent = data.isStreaming
+    ? data.streamedContent || ""
+    : data.content;
 
-  protected getNodeTitle(): string {
-    return "Output";
-  }
+  const hasContent = displayContent && displayContent.trim().length > 0;
 
-  protected getNodeWidth(): string {
-    return "w-96";
-  }
+  return (
+    <NodeWrapper
+      data={data}
+      icon="📄"
+      title="Output"
+      width="w-96"
+      minHeight="min-h-[280px]"
+      hasSourceHandle={false}
+    >
+      <div className="space-y-3">
+        {/* Status Badge */}
+        {data.isStreaming && (
+          <Badge variant="outline" className="w-fit">
+            Streaming...
+          </Badge>
+        )}
 
-  protected getMinHeight(): string {
-    return "min-h-[300px]";
-  }
-
-  protected renderStatusBadge(): JSX.Element | string {
-    return this.data.isStreaming ? (
-      <>
-        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-        Streaming
-      </>
-    ) : (
-      this.data.status
-    );
-  }
-
-  protected renderSourceHandle(): JSX.Element | null {
-    return null; // Output node doesn't have source handle
-  }
-
-  protected renderContent(): JSX.Element {
-    return (
-      <>
-        <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded min-h-[200px] text-sm">
-          {this.data.isStreaming && this.data.streamedContent ? (
-            <div className="whitespace-pre-wrap">
-              {this.data.streamedContent}
-              <span className="animate-pulse">|</span>
-            </div>
-          ) : this.data.content ? (
-            <div className="whitespace-pre-wrap">{this.data.content}</div>
+        {/* Content Display */}
+        <div className="min-h-[150px]">
+          {hasContent ? (
+            <ScrollArea className="h-[150px] w-full rounded border bg-muted/50 p-3">
+              <pre className="text-sm whitespace-pre-wrap font-mono">
+                {displayContent}
+              </pre>
+              {data.isStreaming && <span className="animate-pulse">|</span>}
+            </ScrollArea>
           ) : (
-            <div className="text-muted-foreground italic">
-              No output yet. Run the workflow to see results.
+            <div className="h-[150px] w-full rounded border bg-muted/20 flex items-center justify-center text-muted-foreground">
+              <p className="text-sm">No output yet</p>
             </div>
           )}
         </div>
 
-        {this.data.tokenCount &&
-          typeof this.data.tokenCount === "number" &&
-          !isNaN(this.data.tokenCount) && (
-            <div className="mt-2 text-xs text-muted-foreground">
-              Tokens: {this.data.tokenCount}
+        {/* Token Count */}
+        {data.tokenCount !== undefined &&
+          typeof data.tokenCount === "number" &&
+          !isNaN(data.tokenCount) && (
+            <div className="flex justify-between items-center text-xs text-muted-foreground">
+              <span>Token count: {data.tokenCount}</span>
             </div>
           )}
-
-        {this.data.error && (
-          <div className="mt-2 text-xs text-red-500 bg-red-50 p-2 rounded">
-            Error: {this.data.error}
-          </div>
-        )}
-      </>
-    );
-  }
-}
-
-// React Component Wrapper for Output Node
-export function OutputNode({ data }: NodeProps) {
-  const nodeData = data as OutputNodeData;
-  const { updateNodeData } = useStore();
-
-  const nodeInstance = new OutputNodeClass(nodeData, updateNodeData);
-  return nodeInstance.render();
+      </div>
+    </NodeWrapper>
+  );
 }

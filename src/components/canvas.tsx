@@ -2,6 +2,7 @@ import { useCallback, useRef, useEffect } from "react";
 import { nodeTypes } from "@/components/nodes";
 import { useStore } from "@/lib/store";
 import { NodeType } from "@/types/nodes";
+import type { CustomNode } from "@/types/nodes";
 import {
   Play,
   MessageSquare,
@@ -30,6 +31,8 @@ import {
   Background,
   addEdge,
   BackgroundVariant,
+  applyNodeChanges,
+  applyEdgeChanges,
   type NodeChange,
   type EdgeChange,
   type Connection,
@@ -110,7 +113,7 @@ const CATEGORIES = [
 ];
 
 // Initial demo nodes
-const initialNodes = [
+const initialNodes: CustomNode[] = [
   {
     id: "start-1",
     position: { x: 50, y: 50 },
@@ -121,7 +124,7 @@ const initialNodes = [
     },
     type: NodeType.START,
     dragHandle: ".node-drag",
-  },
+  } as CustomNode,
   {
     id: "text-1",
     position: { x: 50, y: 400 },
@@ -133,7 +136,7 @@ const initialNodes = [
     },
     type: NodeType.TEXT_PROMPT,
     dragHandle: ".node-drag",
-  },
+  } as CustomNode,
   {
     id: "llm-1",
     position: { x: 50, y: 800 },
@@ -146,7 +149,7 @@ const initialNodes = [
     },
     type: NodeType.LLM_INVOCATION,
     dragHandle: ".node-drag",
-  },
+  } as CustomNode,
   {
     id: "output-1",
     position: { x: 450, y: 400 },
@@ -158,7 +161,7 @@ const initialNodes = [
     },
     type: NodeType.OUTPUT,
     dragHandle: ".node-drag",
-  },
+  } as CustomNode,
 ];
 
 const initialEdges = [
@@ -166,6 +169,36 @@ const initialEdges = [
   { id: "e-text-llm", source: "text-1", target: "llm-1" },
   { id: "e-llm-output", source: "llm-1", target: "output-1" },
 ];
+
+// Add this function before the Canvas component
+const getNodeColor = (node: CustomNode) => {
+  switch (node.type) {
+    case NodeType.START:
+      return "#10b981"; // Green for start nodes
+    case NodeType.TEXT_PROMPT:
+      return "#3b82f6"; // Blue for text prompt nodes
+    case NodeType.LLM_INVOCATION:
+      return "#8b5cf6"; // Purple for LLM invocation nodes
+    case NodeType.OUTPUT:
+      return "#f59e0b"; // Orange for output nodes
+    default:
+      return "#6b7280"; // Gray for any unknown types
+  }
+};
+
+// Optional: Add stroke color based on node status
+const getNodeStrokeColor = (node: CustomNode) => {
+  switch (node.data.status) {
+    case "running":
+      return "#3b82f6"; // Blue border for running nodes
+    case "success":
+      return "#10b981"; // Green border for successful nodes
+    case "error":
+      return "#ef4444"; // Red border for error nodes
+    default:
+      return "#6b7280"; // Gray border for idle nodes
+  }
+};
 
 export default function Canvas() {
   const {
@@ -196,44 +229,6 @@ export default function Canvas() {
     (type: NodeType, event?: React.MouseEvent) => {
       const newId = `${type}-${Date.now()}`;
 
-      let nodeData;
-      switch (type) {
-        case NodeType.START:
-          nodeData = {
-            id: newId,
-            workflowName: "New Workflow",
-            status: "idle" as const,
-          };
-          break;
-        case NodeType.TEXT_PROMPT:
-          nodeData = {
-            id: newId,
-            text: "",
-            status: "idle" as const,
-            characterCount: 0,
-          };
-          break;
-        case NodeType.LLM_INVOCATION:
-          nodeData = {
-            id: newId,
-            model: "gpt-3.5-turbo" as const,
-            temperature: 0.7,
-            maxTokens: 150,
-            status: "idle" as const,
-          };
-          break;
-        case NodeType.OUTPUT:
-          nodeData = {
-            id: newId,
-            content: "",
-            isStreaming: false,
-            status: "idle" as const,
-          };
-          break;
-        default:
-          return;
-      }
-
       // Calculate position - use context menu event position if available
       let position = { x: 100, y: 100 }; // Default position
       if (event) {
@@ -255,12 +250,64 @@ export default function Canvas() {
         }
       }
 
-      const newNode = {
-        id: newId,
-        position,
-        data: nodeData,
-        type,
-      };
+      let newNode: CustomNode;
+
+      switch (type) {
+        case NodeType.START:
+          newNode = {
+            id: newId,
+            position,
+            data: {
+              id: newId,
+              workflowName: "New Workflow",
+              status: "idle" as const,
+            },
+            type,
+          } as CustomNode;
+          break;
+        case NodeType.TEXT_PROMPT:
+          newNode = {
+            id: newId,
+            position,
+            data: {
+              id: newId,
+              text: "",
+              status: "idle" as const,
+              characterCount: 0,
+            },
+            type,
+          } as CustomNode;
+          break;
+        case NodeType.LLM_INVOCATION:
+          newNode = {
+            id: newId,
+            position,
+            data: {
+              id: newId,
+              model: "gpt-3.5-turbo" as const,
+              temperature: 0.7,
+              maxTokens: 150,
+              status: "idle" as const,
+            },
+            type,
+          } as CustomNode;
+          break;
+        case NodeType.OUTPUT:
+          newNode = {
+            id: newId,
+            position,
+            data: {
+              id: newId,
+              content: "",
+              isStreaming: false,
+              status: "idle" as const,
+            },
+            type,
+          } as CustomNode;
+          break;
+        default:
+          return;
+      }
 
       setNodes([...nodes, newNode]);
     },
@@ -332,27 +379,7 @@ export default function Canvas() {
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      // Apply changes to nodes while preserving our custom data
-      const updatedNodes = changes.reduce((acc, change) => {
-        if (change.type === "position" && change.position) {
-          return acc.map((node) =>
-            node.id === change.id
-              ? { ...node, position: change.position! }
-              : node
-          );
-        }
-        if (change.type === "select") {
-          return acc.map((node) =>
-            node.id === change.id
-              ? { ...node, selected: change.selected }
-              : node
-          );
-        }
-        if (change.type === "remove") {
-          return acc.filter((node) => node.id !== change.id);
-        }
-        return acc;
-      }, nodes);
+      const updatedNodes = applyNodeChanges(changes, nodes) as CustomNode[];
 
       // Check if this is a user action (like dragging/removing) or just selection/internal changes
       const hasUserChanges = changes.some(
@@ -370,19 +397,7 @@ export default function Canvas() {
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
-      const updatedEdges = changes.reduce((acc, change) => {
-        if (change.type === "select") {
-          return acc.map((edge) =>
-            edge.id === change.id
-              ? { ...edge, selected: change.selected }
-              : edge
-          );
-        }
-        if (change.type === "remove") {
-          return acc.filter((edge) => edge.id !== change.id);
-        }
-        return acc;
-      }, edges);
+      const updatedEdges = applyEdgeChanges(changes, edges);
 
       // Check if this is a user action (like removing) or just selection/internal changes
       const hasUserChanges = changes.some((change) => change.type === "remove");
@@ -460,7 +475,13 @@ export default function Canvas() {
               fitView
             >
               <Controls />
-              <MiniMap zoomable pannable nodeStrokeWidth={3} />
+              <MiniMap
+                zoomable
+                pannable
+                nodeStrokeWidth={3}
+                nodeColor={getNodeColor}
+                nodeStrokeColor={getNodeStrokeColor}
+              />
               <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
             </ReactFlow>
           </div>

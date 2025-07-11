@@ -1,7 +1,7 @@
-import { NodeProps } from "@xyflow/react";
-import { LLMInvocationNodeData } from "@/types/nodes";
+import { type NodeProps } from "@xyflow/react";
+import { type LLMInvocationNode } from "@/types/nodes";
 import { useStore } from "@/lib/store";
-import { BaseNode } from "@/components/nodes/BaseNode";
+import { NodeWrapper } from "@/components/nodes/BaseNode";
 import {
   Select,
   SelectContent,
@@ -12,55 +12,44 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// LLM Invocation Node Class
-class LLMInvocationNodeClass extends BaseNode<LLMInvocationNodeData> {
-  protected getNodeIcon(): string {
-    return "🤖";
-  }
+export function LLMInvocationNode({ data, id }: NodeProps<LLMInvocationNode>) {
+  const { updateNodeData } = useStore();
 
-  protected getNodeTitle(): string {
-    return "LLM Invocation";
-  }
-
-  protected getNodeWidth(): string {
-    return "w-80";
-  }
-
-  protected getMinHeight(): string {
-    return "min-h-[250px]";
-  }
-
-  private handleModelChange = (value: string) => {
-    this.updateNodeData(this.data.id, { model: value as any });
-  };
-
-  private handleTempChange = (value: number[]) => {
-    this.updateNodeData(this.data.id, {
-      temperature: value[0],
+  const handleModelChange = (model: string) => {
+    updateNodeData(id, {
+      model: model as any,
     });
   };
 
-  private handleMaxTokensChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.updateNodeData(this.data.id, { maxTokens: parseInt(e.target.value) });
+  const handleTemperatureChange = (temperature: number[]) => {
+    updateNodeData(id, {
+      temperature: temperature[0],
+    });
   };
 
-  protected renderContent(): JSX.Element {
-    return (
-      <div className="space-y-3">
+  const handleMaxTokensChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 0;
+    updateNodeData(id, {
+      maxTokens: Math.min(Math.max(value, 1), 4000),
+    });
+  };
+
+  return (
+    <NodeWrapper
+      data={data}
+      icon="🤖"
+      title="LLM Invocation"
+      width="w-80"
+      minHeight="min-h-[280px]"
+    >
+      <div className="space-y-4">
+        {/* Model Selection */}
         <div className="space-y-2">
           <Label className="text-xs font-medium">Model</Label>
-          <Select
-            value={this.data.model}
-            onValueChange={this.handleModelChange}
-          >
-            <SelectTrigger
-              className="w-full"
-              onMouseDown={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <SelectValue />
+          <Select value={data.model} onValueChange={handleModelChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select model" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="gpt-4">GPT-4</SelectItem>
@@ -71,53 +60,43 @@ class LLMInvocationNodeClass extends BaseNode<LLMInvocationNodeData> {
           </Select>
         </div>
 
+        {/* Temperature Slider */}
         <div className="space-y-2">
-          <Label className="text-xs font-medium">
-            Temperature: {this.data.temperature}
-          </Label>
+          <div className="flex justify-between items-center">
+            <Label className="text-xs font-medium">Temperature</Label>
+            <span className="text-xs text-muted-foreground">
+              {data.temperature.toFixed(1)}
+            </span>
+          </div>
           <Slider
-            value={[this.data.temperature]}
-            onValueChange={this.handleTempChange}
-            min={0}
+            value={[data.temperature]}
+            onValueChange={handleTemperatureChange}
             max={2}
+            min={0}
             step={0.1}
             className="w-full"
-            onMouseDown={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
           />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Focused</span>
+            <span>Creative</span>
+          </div>
         </div>
 
+        {/* Max Tokens */}
         <div className="space-y-2">
           <Label className="text-xs font-medium">Max Tokens</Label>
           <Input
             type="number"
-            value={this.data.maxTokens}
-            onChange={this.handleMaxTokensChange}
+            value={data.maxTokens}
+            onChange={handleMaxTokensChange}
             onMouseDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
+            min={1}
+            max={4000}
             className="w-full"
-            min="1"
-            max="4000"
           />
         </div>
-
-        {this.data.error && (
-          <Alert variant="destructive">
-            <AlertDescription className="text-xs">
-              Error: {this.data.error}
-            </AlertDescription>
-          </Alert>
-        )}
       </div>
-    );
-  }
-}
-
-// React Component Wrapper for LLM Invocation Node
-export function LLMInvocationNode({ data }: NodeProps) {
-  const nodeData = data as LLMInvocationNodeData;
-  const { updateNodeData } = useStore();
-
-  const nodeInstance = new LLMInvocationNodeClass(nodeData, updateNodeData);
-  return nodeInstance.render();
+    </NodeWrapper>
+  );
 }

@@ -1,85 +1,44 @@
 import { Textarea } from "@/components/ui/textarea";
-import { NodeProps } from "@xyflow/react";
-import { TextPromptNodeData } from "@/types/nodes";
+import { type NodeProps } from "@xyflow/react";
+import { type TextPromptNode } from "@/types/nodes";
 import { useStore } from "@/lib/store";
-import { BaseNode } from "@/components/nodes/BaseNode";
+import { NodeWrapper } from "@/components/nodes/BaseNode";
 import { useState } from "react";
 
-// Text Prompt Node Class
-class TextPromptNodeClass extends BaseNode<TextPromptNodeData> {
-  private localText: string;
-  private setLocalText: (text: string) => void;
+export function TextPromptNode({ data, id }: NodeProps<TextPromptNode>) {
+  const { updateNodeData } = useStore();
+  const [localText, setLocalText] = useState(data.text);
 
-  constructor(
-    data: TextPromptNodeData,
-    updateNodeData: (id: string, updates: Partial<TextPromptNodeData>) => void,
-    localText: string,
-    setLocalText: (text: string) => void
-  ) {
-    super(data, updateNodeData);
-    this.localText = localText;
-    this.setLocalText = setLocalText;
-  }
-
-  protected getNodeIcon(): string {
-    return "📝";
-  }
-
-  protected getNodeTitle(): string {
-    return "Text Prompt";
-  }
-
-  protected getNodeWidth(): string {
-    return "w-80";
-  }
-
-  protected getMinHeight(): string {
-    return "min-h-[200px]";
-  }
-
-  private handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
-    this.setLocalText(newText);
-    this.updateNodeData(this.data.id, {
+    setLocalText(newText);
+    updateNodeData(id, {
       text: newText,
       characterCount: newText.length,
     });
   };
 
-  protected renderContent(): JSX.Element {
-    return (
-      <>
+  return (
+    <NodeWrapper
+      data={data}
+      icon="📝"
+      title="Text Prompt"
+      width="w-80"
+      minHeight="min-h-[200px]"
+    >
+      <div className="space-y-3">
         <Textarea
-          value={this.localText}
-          onChange={this.handleTextChange}
+          value={localText}
+          onChange={handleTextChange}
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           placeholder="Enter your prompt here..."
           className="min-h-[100px] resize-none"
         />
-        <div className="flex justify-between items-center mt-2 text-xs text-muted-foreground">
-          <span>{this.data.characterCount || 0} characters</span>
-          {this.data.error && (
-            <span className="text-red-500">Error: {this.data.error}</span>
-          )}
+        <div className="flex justify-between items-center text-xs text-muted-foreground">
+          <span>{data.characterCount || 0} characters</span>
         </div>
-      </>
-    );
-  }
-}
-
-// React Component Wrapper for Text Prompt Node
-export function TextPromptNode({ data }: NodeProps) {
-  const nodeData = data as TextPromptNodeData;
-  const { updateNodeData } = useStore();
-  const [localText, setLocalText] = useState(nodeData.text);
-
-  const nodeInstance = new TextPromptNodeClass(
-    nodeData,
-    updateNodeData,
-    localText,
-    setLocalText
+      </div>
+    </NodeWrapper>
   );
-
-  return nodeInstance.render();
 }
