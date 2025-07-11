@@ -65,7 +65,7 @@ export function NodeWrapper({
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="p-4">
+      <CardContent>
         {children}
         {data.error && (
           <div className="mt-2 text-xs text-red-500">Error: {data.error}</div>
