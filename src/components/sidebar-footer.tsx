@@ -1,7 +1,6 @@
-import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-import { PROVIDER_METADATA } from "@/types/settings";
+import { Settings } from "lucide-react";
 
 export default function SidebarFooter() {
   const { openSettingsDialog, settings, settingsLoaded } = useStore();

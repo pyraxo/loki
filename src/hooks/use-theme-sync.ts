@@ -1,8 +1,6 @@
-import { useEffect } from "react";
-import { useTheme } from "next-themes";
 import { useStore } from "@/lib/store";
-import { themeService } from "@/lib/theme-service";
-import { type ThemeMode } from "@/types/settings";
+import { useTheme } from "next-themes";
+import { useEffect } from "react";
 
 /**
  * useThemeSync Hook

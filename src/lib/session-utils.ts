@@ -210,6 +210,7 @@ export function useSessionShortcuts() {
     deleteSession,
     showConfirmationDialog,
     showRenameDialog,
+    toggleSettingsDialog,
   } = useStore();
 
   useEffect(() => {
@@ -318,6 +319,11 @@ export function useSessionShortcuts() {
         if (sessionIndex < sessionIds.length) {
           loadSession(sessionIds[sessionIndex]);
         }
+      }
+
+      if ((event.metaKey || event.ctrlKey) && event.key === ",") {
+        event.preventDefault();
+        toggleSettingsDialog();
       }
     };
 

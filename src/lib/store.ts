@@ -157,6 +157,7 @@ interface CanvasState {
   // Settings dialog actions
   openSettingsDialog: (tab?: string) => void;
   closeSettingsDialog: () => void;
+  toggleSettingsDialog: () => void;
 
   // Settings export/import
   exportSettings: () => Promise<string>;
@@ -940,6 +941,15 @@ export const useStore = create<CanvasState>((set, get) => ({
       settingsDialog: {
         isOpen: false,
         activeTab: "providers",
+      },
+    });
+  },
+
+  toggleSettingsDialog: () => {
+    set({
+      settingsDialog: {
+        isOpen: !get().settingsDialog.isOpen,
+        activeTab: get().settingsDialog.activeTab,
       },
     });
   },
