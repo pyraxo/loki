@@ -1,9 +1,7 @@
-import { create } from "zustand";
-import { type Edge } from "@xyflow/react";
 import {
+  type BaseNodeData,
   type CustomNode,
   type WorkflowState,
-  type BaseNodeData,
 } from "@/types/nodes";
 import {
   type Session,
@@ -17,6 +15,8 @@ import {
   type ThemeMode,
   createDefaultSettings,
 } from "@/types/settings";
+import { type Edge } from "@xyflow/react";
+import { create } from "zustand";
 import { sessionService } from "./session-service";
 import { settingsService } from "./settings-service";
 
@@ -270,7 +270,7 @@ export const useStore = create<CanvasState>((set, get) => ({
       node.id === nodeId
         ? { ...node, data: { ...node.data, status, error } }
         : node
-    );
+    ) as CustomNode[];
     set({ nodes: updatedNodes });
   },
 
@@ -379,7 +379,7 @@ export const useStore = create<CanvasState>((set, get) => ({
     const resetNodes = nodes.map((node) => ({
       ...node,
       data: { ...node.data, status: "idle" as const, error: undefined },
-    }));
+    })) as CustomNode[];
     set({ nodes: resetNodes, hasUnsavedChanges: true });
     get().markSessionAsUnsaved();
   },

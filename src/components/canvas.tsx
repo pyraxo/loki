@@ -339,25 +339,6 @@ export default function Canvas() {
     const handleKeyDown = (event: KeyboardEvent) => {
       const isCtrlOrCmd = event.ctrlKey || event.metaKey;
 
-      // Node creation shortcuts
-      if (isCtrlOrCmd && event.key >= "1" && event.key <= "4") {
-        event.preventDefault();
-        switch (event.key) {
-          case "1":
-            createNode(NodeType.START);
-            break;
-          case "2":
-            createNode(NodeType.TEXT_PROMPT);
-            break;
-          case "3":
-            createNode(NodeType.LLM_INVOCATION);
-            break;
-          case "4":
-            createNode(NodeType.OUTPUT);
-            break;
-        }
-      }
-
       // Delete selected nodes/edges
       if (event.key === "Delete" || event.key === "Backspace") {
         // Only handle if focus is on canvas or no specific input is focused
