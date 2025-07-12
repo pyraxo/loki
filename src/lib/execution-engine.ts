@@ -1,8 +1,7 @@
-import { type CustomNode } from "@/types/nodes";
+import { NodeType, type CustomNode } from "@/types/nodes";
 import { type Edge } from "@xyflow/react";
-import { useStore } from "./store";
 import { LLMService, type LLMParams } from "./llm-service";
-import { NodeType } from "@/types/nodes";
+import { useStore } from "./store";
 
 export class ExecutionEngine {
   private abortController: AbortController | null = null;
@@ -234,7 +233,8 @@ export class ExecutionEngine {
   // Execute the entire workflow
   async executeWorkflow(): Promise<void> {
     const state = useStore.getState() as any;
-    const { nodes, edges } = state;
+    const { edges } = state;
+    let { nodes } = state;
 
     if (!nodes.length) {
       throw new Error("No nodes to execute");
@@ -254,17 +254,30 @@ export class ExecutionEngine {
 
       // Execute nodes in dependency order
       const executedNodes = new Set<string>();
-      const nodesToExecute = [...nodes];
+      let nodesToExecute = [...nodes];
 
       while (nodesToExecute.length > 0) {
+        // Fetch fresh node state from store to get updated statuses
+        const currentState = useStore.getState() as any;
+        const currentNodes = currentState.nodes;
+
         const readyNodes = nodesToExecute.filter((node) => {
           if (executedNodes.has(node.id)) return false;
 
           // Start nodes can always execute
           if (node.type === NodeType.START) return true;
 
-          // Other nodes need their inputs ready
-          return this.areInputsReady(node.id, edges, nodes);
+          // Other nodes need their inputs ready - use current node state
+          const isReady = this.areInputsReady(node.id, edges, currentNodes);
+
+          // Debug logging to help verify the fix
+          if (process.env.NODE_ENV === 'development') {
+            const inputNodes = this.getInputNodes(node.id, edges, currentNodes);
+            const inputStatuses = inputNodes.map(n => `${n.type}:${(n.data as any).status}`).join(', ');
+            console.log(`Node ${node.id} (${node.type}) ready check: ${isReady} | Input statuses: [${inputStatuses}]`);
+          }
+
+          return isReady;
         });
 
         if (readyNodes.length === 0) {
@@ -287,16 +300,17 @@ export class ExecutionEngine {
               throw new Error("Workflow execution aborted");
             }
 
-            await this.executeNode(node, edges, nodes);
+            // Use current node state for execution
+            const currentState = useStore.getState() as any;
+            const currentNodes = currentState.nodes;
+            await this.executeNode(node, edges, currentNodes);
             executedNodes.add(node.id);
           })
         );
 
-        // Remove executed nodes from the queue
-        nodesToExecute.splice(0, nodesToExecute.length);
-        nodesToExecute.push(
-          ...nodes.filter((node: any) => !executedNodes.has(node.id))
-        );
+        // Remove executed nodes from the queue - use fresh node list
+        const freshState = useStore.getState() as any;
+        nodesToExecute = freshState.nodes.filter((node: any) => !executedNodes.has(node.id));
       }
     } catch (error) {
       const errorMessage =
