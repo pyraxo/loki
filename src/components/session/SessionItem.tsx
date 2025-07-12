@@ -1,5 +1,5 @@
-import { Clock, AlertCircle, Play, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -16,10 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { type Session, SessionStatus } from "@/types/sessions";
 import { useStore } from "@/lib/store";
+import { type Session, SessionStatus } from "@/types/sessions";
 import { formatDistanceToNow } from "date-fns";
+import { Clock, FileText } from "lucide-react";
 import { useState } from "react";
 
 interface SessionItemProps {
@@ -167,7 +167,10 @@ export default function SessionItem({
 
               {session.metadata.errorMessage && (
                 <div className="text-xs text-red-600 mt-1 truncate">
-                  Error: {session.metadata.errorMessage}
+                  Error:{" "}
+                  {session.metadata.errorMessage.length > 20
+                    ? session.metadata.errorMessage.slice(0, 20) + "..."
+                    : session.metadata.errorMessage}
                 </div>
               )}
             </div>

@@ -1,18 +1,5 @@
-import { useCallback, useRef, useEffect } from "react";
 import { nodeTypes } from "@/components/nodes";
-import { useStore } from "@/lib/store";
-import { NodeType } from "@/types/nodes";
-import type { CustomNode } from "@/types/nodes";
-import {
-  Play,
-  MessageSquare,
-  Brain,
-  FileOutput,
-  GitBranch,
-  Timer,
-  Merge,
-  Plus,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -22,20 +9,35 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Button } from "@/components/ui/button";
+import { useResolvedTheme } from "@/hooks/use-theme-sync";
+import { useStore } from "@/lib/store";
+import type { CustomNode } from "@/types/nodes";
+import { NodeType } from "@/types/nodes";
+import {
+  Brain,
+  FileOutput,
+  GitBranch,
+  Merge,
+  MessageSquare,
+  Play,
+  Plus,
+  Timer,
+} from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
 
 import {
-  ReactFlow,
-  MiniMap,
-  Controls,
   Background,
-  addEdge,
   BackgroundVariant,
-  applyNodeChanges,
+  Controls,
+  MiniMap,
+  ReactFlow,
+  addEdge,
   applyEdgeChanges,
-  type NodeChange,
-  type EdgeChange,
+  applyNodeChanges,
+  type ColorMode,
   type Connection,
+  type EdgeChange,
+  type NodeChange,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -213,7 +215,11 @@ export default function Canvas() {
     createSession,
     loadSession,
   } = useStore();
+  const { resolvedTheme } = useResolvedTheme();
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Convert theme to React Flow ColorMode
+  const colorMode: ColorMode = resolvedTheme === "dark" ? "dark" : "light";
 
   // Initialize with demo nodes if empty (only on first mount, not during session loading)
   useEffect(() => {
@@ -471,6 +477,7 @@ export default function Canvas() {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              colorMode={colorMode}
               proOptions={{ hideAttribution: true }}
               fitView
             >

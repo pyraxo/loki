@@ -295,7 +295,7 @@ export function useSessionShortcuts() {
       // Cmd/Ctrl + Delete - Delete active session (with confirmation)
       if (
         (event.metaKey || event.ctrlKey) &&
-        event.key === "Delete" &&
+        event.key === "Backspace" &&
         !isInputFocused &&
         activeSessionId
       ) {
