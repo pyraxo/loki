@@ -1,10 +1,10 @@
-import { streamText } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
-import { settingsService } from "./settings-service";
 import { PROVIDER_METADATA } from "@/types/settings";
+import { createOpenAI } from "@ai-sdk/openai";
+import { streamText } from "ai";
+import { settingsService } from "./settings-service";
 
 export interface LLMParams {
-  model: "gpt-4" | "gpt-3.5-turbo" | "claude-3-haiku" | "claude-3-sonnet";
+  model: string;
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;

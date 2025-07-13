@@ -1,7 +1,6 @@
-import { type NodeProps } from "@xyflow/react";
-import { type LLMInvocationNode } from "@/types/nodes";
-import { useStore } from "@/lib/store";
 import { NodeWrapper } from "@/components/nodes/BaseNode";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -10,11 +9,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useStore } from "@/lib/store";
+import { type LLMInvocationNode } from "@/types/nodes";
+import { PROVIDER_METADATA, type LLMProvider } from "@/types/settings";
+import { type NodeProps } from "@xyflow/react";
 
 export function LLMInvocationNode({ data, id }: NodeProps<LLMInvocationNode>) {
-  const { updateNodeData } = useStore();
+  const { updateNodeData, settings } = useStore();
+
+  // Get all models from enabled providers
+  const getAvailableModels = () => {
+    const availableModels: Array<{
+      value: string;
+      label: string;
+      provider: string;
+    }> = [];
+
+    Object.entries(settings.providers).forEach(([provider, config]) => {
+      if (config.enabled) {
+        const providerKey = provider as LLMProvider;
+        const metadata = PROVIDER_METADATA[providerKey];
+
+        metadata.models.forEach((model) => {
+          availableModels.push({
+            value: model,
+            label: `${model} (${metadata.name})`,
+            provider: providerKey,
+          });
+        });
+      }
+    });
+
+    return availableModels;
+  };
+
+  const availableModels = getAvailableModels();
 
   const handleModelChange = (model: string) => {
     updateNodeData(id, {
@@ -49,13 +78,26 @@ export function LLMInvocationNode({ data, id }: NodeProps<LLMInvocationNode>) {
           <Label className="text-xs font-medium">Model</Label>
           <Select value={data.model} onValueChange={handleModelChange}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select model" />
+              <SelectValue
+                placeholder={
+                  availableModels.length > 0
+                    ? "Select model"
+                    : "No enabled providers"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="gpt-4">GPT-4</SelectItem>
-              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-              <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
-              <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+              {availableModels.length > 0 ? (
+                availableModels.map((model) => (
+                  <SelectItem key={model.value} value={model.value}>
+                    {model.label}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="" disabled>
+                  Enable providers in Settings to see models
+                </SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>

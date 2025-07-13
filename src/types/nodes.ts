@@ -15,7 +15,7 @@ export type TextPromptNodeData = {
 } & BaseNodeData;
 
 export type LLMInvocationNodeData = {
-  model: "gpt-4" | "gpt-3.5-turbo" | "claude-3-haiku" | "claude-3-sonnet";
+  model: string;
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
