@@ -1,19 +1,19 @@
-import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
-import { Handle, Position } from "@xyflow/react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BaseNodeData } from "@/types/nodes";
+import { Handle, NodeResizer, Position } from "@xyflow/react";
+import { Loader2 } from "lucide-react";
 
 interface NodeWrapperProps {
   data: BaseNodeData;
   children: React.ReactNode;
   icon: string;
   title: string;
-  width?: string;
-  minHeight?: string;
+  minWidth?: number;
+  minHeight?: number;
   hasTargetHandle?: boolean;
   hasSourceHandle?: boolean;
+  selected?: boolean;
 }
 
 export function NodeWrapper({
@@ -21,10 +21,11 @@ export function NodeWrapper({
   children,
   icon,
   title,
-  width = "w-80",
-  minHeight = "min-h-[200px]",
+  minWidth = 80,
+  minHeight = 200,
   hasTargetHandle = true,
   hasSourceHandle = true,
+  selected = false,
 }: NodeWrapperProps) {
   const getStatusColor = () => {
     switch (data.status) {
@@ -52,8 +53,14 @@ export function NodeWrapper({
 
   return (
     <Card
-      className={`${width} ${minHeight} ${getStatusColor()} border-2 cursor-default pt-0`}
+      className={`w-full h-full ${getStatusColor()} border-2 cursor-default pt-0`}
     >
+      <NodeResizer
+        isVisible={selected}
+        color="white"
+        minWidth={minWidth}
+        minHeight={minHeight}
+      />
       {hasTargetHandle && <Handle type="target" position={Position.Top} />}
 
       <CardHeader className="pb-2 pt-6 px-4 cursor-move border-b-1 rounded-t-lg node-drag">

@@ -14,7 +14,11 @@ import { type LLMInvocationNode } from "@/types/nodes";
 import { PROVIDER_METADATA, type LLMProvider } from "@/types/settings";
 import { type NodeProps } from "@xyflow/react";
 
-export function LLMInvocationNode({ data, id }: NodeProps<LLMInvocationNode>) {
+export function LLMInvocationNode({
+  data,
+  id,
+  selected,
+}: NodeProps<LLMInvocationNode>) {
   const { updateNodeData, settings } = useStore();
 
   // Get all models from enabled providers
@@ -69,8 +73,9 @@ export function LLMInvocationNode({ data, id }: NodeProps<LLMInvocationNode>) {
       data={data}
       icon="🤖"
       title="LLM Invocation"
-      width="w-80"
-      minHeight="min-h-[280px]"
+      minWidth={300}
+      minHeight={320}
+      selected={selected}
     >
       <div className="space-y-4">
         {/* Model Selection */}

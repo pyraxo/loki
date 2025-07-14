@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { Square, Play } from "lucide-react";
-import { type NodeProps } from "@xyflow/react";
-import { type StartNode } from "@/types/nodes";
-import { useStore } from "@/lib/store";
 import { NodeWrapper } from "@/components/nodes/BaseNode";
+import { Button } from "@/components/ui/button";
 import { executionEngine } from "@/lib/execution-engine";
+import { useStore } from "@/lib/store";
+import { type StartNode } from "@/types/nodes";
+import { type NodeProps } from "@xyflow/react";
+import { Play, Square } from "lucide-react";
 
-export function StartNode({ data }: NodeProps<StartNode>) {
-  const { workflow, startWorkflow, stopWorkflow } = useStore();
+export function StartNode({ data, selected }: NodeProps<StartNode>) {
+  const { workflow, startWorkflow, stopWorkflow, resetWorkflow } = useStore();
 
   const handleRunClick = async () => {
     if (workflow.isRunning) {
@@ -15,6 +15,8 @@ export function StartNode({ data }: NodeProps<StartNode>) {
       stopWorkflow();
     } else {
       try {
+        // Reset all node statuses before starting workflow
+        resetWorkflow();
         startWorkflow();
         await executionEngine.executeWorkflow();
       } catch (error) {
@@ -28,9 +30,10 @@ export function StartNode({ data }: NodeProps<StartNode>) {
       data={data}
       icon="🚀"
       title="Start"
-      width="w-64"
-      minHeight="min-h-[150px]"
+      minWidth={240}
+      minHeight={240}
       hasTargetHandle={false}
+      selected={selected}
     >
       <div className="space-y-3">
         <div>

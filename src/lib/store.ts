@@ -1,3 +1,4 @@
+import { initialEdges, initialNodes } from "@/components/nodes/defaults";
 import {
   type BaseNodeData,
   type CustomNode,
@@ -390,8 +391,7 @@ export const useStore = create<CanvasState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const { nodes, edges } = get();
-      const session = await sessionService.createSession(name, nodes, edges);
+      const session = await sessionService.createSession(name, initialNodes, initialEdges);
 
       const { sessions } = get();
       set({

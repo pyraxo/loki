@@ -1,11 +1,15 @@
-import { Textarea } from "@/components/ui/textarea";
-import { type NodeProps } from "@xyflow/react";
-import { type TextPromptNode } from "@/types/nodes";
-import { useStore } from "@/lib/store";
 import { NodeWrapper } from "@/components/nodes/BaseNode";
+import { Textarea } from "@/components/ui/textarea";
+import { useStore } from "@/lib/store";
+import { type TextPromptNode } from "@/types/nodes";
+import { type NodeProps } from "@xyflow/react";
 import { useState } from "react";
 
-export function TextPromptNode({ data, id }: NodeProps<TextPromptNode>) {
+export function TextPromptNode({
+  data,
+  id,
+  selected,
+}: NodeProps<TextPromptNode>) {
   const { updateNodeData } = useStore();
   const [localText, setLocalText] = useState(data.text);
 
@@ -23,8 +27,9 @@ export function TextPromptNode({ data, id }: NodeProps<TextPromptNode>) {
       data={data}
       icon="📝"
       title="Text Prompt"
-      width="w-80"
-      minHeight="min-h-[200px]"
+      minWidth={240}
+      minHeight={240}
+      selected={selected}
     >
       <div className="space-y-3">
         <Textarea

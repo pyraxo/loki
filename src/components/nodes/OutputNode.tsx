@@ -1,10 +1,10 @@
-import { type NodeProps } from "@xyflow/react";
-import { type OutputNode } from "@/types/nodes";
 import { NodeWrapper } from "@/components/nodes/BaseNode";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { type OutputNode } from "@/types/nodes";
+import { type NodeProps } from "@xyflow/react";
 
-export function OutputNode({ data }: NodeProps<OutputNode>) {
+export function OutputNode({ data, selected }: NodeProps<OutputNode>) {
   const displayContent = data.isStreaming
     ? data.streamedContent || ""
     : data.content;
@@ -16,9 +16,10 @@ export function OutputNode({ data }: NodeProps<OutputNode>) {
       data={data}
       icon="📄"
       title="Output"
-      width="w-96"
-      minHeight="min-h-[280px]"
+      minWidth={300}
+      minHeight={280}
       hasSourceHandle={false}
+      selected={selected}
     >
       <div className="space-y-3">
         {/* Status Badge */}
