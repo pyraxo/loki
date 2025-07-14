@@ -21,25 +21,29 @@ export function OutputNode({ data, selected }: NodeProps<OutputNode>) {
       hasSourceHandle={false}
       selected={selected}
     >
-      <div className="space-y-3">
+      <div className="flex flex-col h-full space-y-3">
         {/* Status Badge */}
         {data.isStreaming && (
-          <Badge variant="outline" className="w-fit">
+          <Badge variant="outline" className="w-fit flex-shrink-0">
             Streaming...
           </Badge>
         )}
 
         {/* Content Display */}
-        <div className="min-h-[150px]">
+        <div className="flex-1 min-h-0 flex">
           {hasContent ? (
-            <ScrollArea className="h-[150px] w-full rounded border bg-muted/50 p-3">
-              <pre className="text-sm whitespace-pre-wrap font-mono">
-                {displayContent}
-              </pre>
-              {data.isStreaming && <span className="animate-pulse">|</span>}
+            <ScrollArea className="w-full h-full rounded border bg-muted/50">
+              <div className="p-3 h-full">
+                <pre className="text-sm whitespace-pre-wrap font-mono">
+                  {displayContent}
+                  {data.isStreaming && (
+                    <span className="animate-pulse ml-1">|</span>
+                  )}
+                </pre>
+              </div>
             </ScrollArea>
           ) : (
-            <div className="h-[150px] w-full rounded border bg-muted/20 flex items-center justify-center text-muted-foreground">
+            <div className="h-full w-full rounded border bg-muted/20 flex items-center justify-center text-muted-foreground">
               <p className="text-sm">No output yet</p>
             </div>
           )}
@@ -49,7 +53,7 @@ export function OutputNode({ data, selected }: NodeProps<OutputNode>) {
         {data.tokenCount !== undefined &&
           typeof data.tokenCount === "number" &&
           !isNaN(data.tokenCount) && (
-            <div className="flex justify-between items-center text-xs text-muted-foreground">
+            <div className="flex-shrink-0 flex justify-between items-center text-xs text-muted-foreground">
               <span>Token count: {data.tokenCount}</span>
             </div>
           )}

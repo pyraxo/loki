@@ -53,7 +53,7 @@ export function NodeWrapper({
 
   return (
     <Card
-      className={`w-full h-full ${getStatusColor()} border-2 cursor-default pt-0`}
+      className={`w-full h-full ${getStatusColor()} border-2 cursor-default pt-0 flex flex-col`}
     >
       <NodeResizer
         isVisible={selected}
@@ -63,7 +63,7 @@ export function NodeWrapper({
       />
       {hasTargetHandle && <Handle type="target" position={Position.Top} />}
 
-      <CardHeader className="pb-2 pt-6 px-4 cursor-move border-b-1 rounded-t-lg node-drag">
+      <CardHeader className="pb-2 pt-6 px-4 cursor-move border-b-1 rounded-t-lg node-drag flex-shrink-0">
         <CardTitle className="text-sm flex items-center justify-between">
           {icon} {title}
           <Badge variant={data.status === "running" ? "default" : "secondary"}>
@@ -72,7 +72,7 @@ export function NodeWrapper({
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col overflow-hidden">
         {children}
         {data.error && (
           <div className="mt-2 text-xs text-red-500">Error: {data.error}</div>
