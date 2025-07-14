@@ -61,28 +61,58 @@ export class ExecutionEngine {
       .join("\n\n");
   }
 
+  // Reset connected output nodes to prepare them for new output
+  private resetConnectedOutputNodes(
+    nodeId: string,
+    edges: Edge[],
+    nodes: CustomNode[]
+  ): void {
+    const outputNodes = this.getOutputNodes(nodeId, edges, nodes);
+    const connectedOutputNodes = outputNodes.filter(
+      (n) => n.type === NodeType.OUTPUT
+    );
+
+    const state = useStore.getState();
+    connectedOutputNodes.forEach((outputNode) => {
+      // Reset output node data and status
+      state.updateNodeDataDuringExecution(outputNode.id, {
+        content: "",
+        isStreaming: false,
+        streamedContent: "",
+        tokenCount: undefined,
+        error: undefined,
+      });
+      state.updateNodeStatus(outputNode.id, "idle");
+    });
+  }
+
   // Execute a single node
   private async executeNode(
     node: CustomNode,
     edges: Edge[],
     nodes: CustomNode[]
   ): Promise<void> {
+    const state = useStore.getState()
     try {
-      (useStore.getState() as any).updateNodeStatus(node.id, "running");
+      state.updateNodeStatus(node.id, "running");
 
       switch (node.type) {
         case NodeType.START:
           // Start node just marks as complete
           await new Promise((resolve) => setTimeout(resolve, 500)); // Small delay for visual feedback
-          (useStore.getState() as any).updateNodeStatus(node.id, "success");
+          state.updateNodeStatus(node.id, "success");
           break;
 
         case NodeType.TEXT_PROMPT:
+          // Reset connected output nodes before producing new output
+          this.resetConnectedOutputNodes(node.id, edges, nodes);
           // Text prompt nodes are always ready (user input)
-          (useStore.getState() as any).updateNodeStatus(node.id, "success");
+          state.updateNodeStatus(node.id, "success");
           break;
 
         case NodeType.LLM_INVOCATION:
+          // Reset connected output nodes before starting LLM execution
+          this.resetConnectedOutputNodes(node.id, edges, nodes);
           await this.executeLLMNode(node, edges, nodes);
           break;
 
@@ -95,28 +125,31 @@ export class ExecutionEngine {
             (n) => n.type === NodeType.LLM_INVOCATION
           );
 
-          // Only update content if not connected to LLM (to preserve streaming content)
-          if (!hasLLMInput && inputText.trim()) {
-            (useStore.getState() as any).updateNodeDataDuringExecution(
-              node.id,
-              {
-                content: inputText,
-                isStreaming: false,
-              }
-            );
+          if (!hasLLMInput) {
+            // Only update content and status if not connected to LLM
+            if (inputText.trim()) {
+              state.updateNodeDataDuringExecution(
+                node.id,
+                {
+                  content: inputText,
+                  isStreaming: false,
+                }
+              );
+            }
+            state.updateNodeStatus(node.id, "success");
           }
-          (useStore.getState() as any).updateNodeStatus(node.id, "success");
+          // If connected to LLM, status will be managed by LLM streaming callbacks
           break;
 
         default:
           throw new Error(`Unknown node type: ${node.type}`);
       }
 
-      (useStore.getState() as any).markNodeCompleted(node.id);
+      state.markNodeCompleted(node.id);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
-      (useStore.getState() as any).markNodeError(node.id, errorMessage);
+      state.markNodeError(node.id, errorMessage);
     }
   }
 
