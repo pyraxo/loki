@@ -613,6 +613,7 @@ export const useStore = create<CanvasState>((set, get) => ({
           isRunning: true,
           status: SessionStatus.RUNNING,
           lastExecutionTime: new Date().toISOString(),
+          errorMessage: undefined, // Clear any previous error when starting new workflow
         },
         false
       ); // Don't update timestamp for status changes

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,19 +9,19 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import {
-  Eye,
-  EyeOff,
-  TestTube2,
-  CheckCircle,
-  XCircle,
-  Loader2,
-} from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useStore } from "@/lib/store";
 import { PROVIDER_METADATA, type LLMProvider } from "@/types/settings";
+import {
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Loader2,
+  TestTube2,
+  XCircle,
+} from "lucide-react";
+import { useState } from "react";
 
 export default function ProviderSettingsTab() {
   const { settings, updateProviderSettings, setApiKey, getApiKey } = useStore();

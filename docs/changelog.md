@@ -38,6 +38,10 @@
 - **Fixed Single Output Limitation**: Resolved issue where LLM nodes only streamed to the first connected output node
 - **Fixed Content Clearing**: Eliminated unwanted content clearing on workflow restart - content now persists until new data arrives
 - **Fixed Error Propagation**: Errors now properly propagate to all connected output nodes with appropriate cleanup
+
+#### Session Error Management
+
+- **Automatic Error Clearing**: Session errors are now automatically cleared when starting a new workflow execution, preventing stale error messages from persisting in the session tab
 - **Enhanced Stream Coordination**: Multiple output nodes now show synchronized streaming indicators and content
 - **Fixed Session Status During Execution**: Resolved issue where streaming updates marked sessions as "unsaved" (yellow) instead of preserving "workflow running" (blue) status
 

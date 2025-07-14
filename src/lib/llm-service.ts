@@ -45,7 +45,6 @@ const getProviderClient = async (model: string) => {
       const fallbackClient = createOpenAI({ apiKey: openaiKey });
       return fallbackClient("gpt-3.5-turbo");
     case "google":
-    case "cohere":
     case "ollama":
       // TODO: Add support for other providers
       console.warn(

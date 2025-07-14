@@ -12,7 +12,6 @@ export type LLMProvider =
   | "openai"
   | "anthropic"
   | "google"
-  | "cohere"
   | "ollama";
 
 // Theme options
@@ -25,7 +24,6 @@ export interface AppSettings {
     openai: ProviderSettings;
     anthropic: ProviderSettings;
     google: ProviderSettings;
-    cohere: ProviderSettings;
     ollama: ProviderSettings;
   };
 
@@ -58,22 +56,17 @@ export const createDefaultSettings = (): AppSettings => ({
   providers: {
     openai: {
       enabled: true,
-      defaultModel: "gpt-3.5-turbo",
+      defaultModel: "gpt-4o",
       rateLimitRpm: 60,
     },
     anthropic: {
       enabled: false,
-      defaultModel: "claude-3-haiku",
+      defaultModel: "claude-sonnet-4-20250514",
       rateLimitRpm: 60,
     },
     google: {
       enabled: false,
-      defaultModel: "gemini-pro",
-      rateLimitRpm: 60,
-    },
-    cohere: {
-      enabled: false,
-      defaultModel: "command",
+      defaultModel: "gemini-2.5-pro",
       rateLimitRpm: 60,
     },
     ollama: {
@@ -104,25 +97,19 @@ export const PROVIDER_METADATA = {
   openai: {
     name: "OpenAI",
     description: "GPT models from OpenAI",
-    models: ["gpt-4", "gpt-3.5-turbo"],
+    models: ["gpt-4.1", "gpt-4o", "o3", "o3-mini"],
     requiresApiKey: true,
   },
   anthropic: {
     name: "Anthropic",
     description: "Claude models from Anthropic",
-    models: ["claude-3-haiku", "claude-3-sonnet"],
+    models: ["claude-sonnet-4-20250514", "claude-3-7-sonnet-latest"],
     requiresApiKey: true,
   },
   google: {
     name: "Google",
     description: "Gemini models from Google",
-    models: ["gemini-pro", "gemini-pro-vision"],
-    requiresApiKey: true,
-  },
-  cohere: {
-    name: "Cohere",
-    description: "Command models from Cohere",
-    models: ["command", "command-light"],
+    models: ["gemini-2.5-pro", "gemini-2.5-flash"],
     requiresApiKey: true,
   },
   ollama: {

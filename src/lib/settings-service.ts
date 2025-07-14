@@ -1,12 +1,12 @@
-import { Store } from "@tauri-apps/plugin-store";
 import {
   type AppSettings,
-  type SettingsExport,
   type LLMProvider,
   type ProviderSettings,
+  type SettingsExport,
   createDefaultSettings,
   PROVIDER_METADATA,
 } from "@/types/settings";
+import { Store } from "@tauri-apps/plugin-store";
 
 const SETTINGS_STORE_KEY = "loki-app-settings.json";
 const SECURE_KEYS_PREFIX = "loki-api-key-";
@@ -179,7 +179,6 @@ class SettingsService {
           return apiKey.length > 10;
 
         case "google":
-        case "cohere":
           // For now, just basic validation - real tests would require proper SDKs
           return apiKey.length > 10;
 
@@ -197,7 +196,6 @@ class SettingsService {
       "openai",
       "anthropic",
       "google",
-      "cohere",
       "ollama",
     ];
     const status: Record<string, boolean> = {};
@@ -262,8 +260,7 @@ class SettingsService {
       await this.saveSettings(mergedSettings);
     } catch (error) {
       throw new Error(
-        `Failed to import settings: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to import settings: ${error instanceof Error ? error.message : "Unknown error"
         }`
       );
     }
