@@ -39,81 +39,10 @@ import {
   type Connection,
   type EdgeChange,
   type NodeChange,
+  type DefaultEdgeOptions,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-
-// Node types structure from NodeLibrary
-const NODE_TYPES = [
-  {
-    type: NodeType.START,
-    name: "Start",
-    description: "Begin workflow execution",
-    icon: Play,
-    category: "Control",
-    badge: "Essential",
-    shortcut: "⌘1",
-  },
-  {
-    type: NodeType.TEXT_PROMPT,
-    name: "Text Prompt",
-    description: "Input text content or prompts",
-    icon: MessageSquare,
-    category: "Input",
-    shortcut: "⌘2",
-  },
-  {
-    type: NodeType.LLM_INVOCATION,
-    name: "LLM Call",
-    description: "Send prompt to language model",
-    icon: Brain,
-    category: "AI",
-    shortcut: "⌘3",
-  },
-  {
-    type: NodeType.OUTPUT,
-    name: "Output",
-    description: "Display or export results",
-    icon: FileOutput,
-    category: "Output",
-    shortcut: "⌘4",
-  },
-  // Future node types (disabled)
-  {
-    type: "CONDITIONAL" as NodeType,
-    name: "Conditional",
-    description: "Branch workflow based on conditions",
-    icon: GitBranch,
-    category: "Control",
-    badge: "Coming Soon",
-    disabled: true,
-  },
-  {
-    type: "DELAY" as NodeType,
-    name: "Delay",
-    description: "Add time delay between operations",
-    icon: Timer,
-    category: "Utility",
-    badge: "Coming Soon",
-    disabled: true,
-  },
-  {
-    type: "MERGE" as NodeType,
-    name: "Merge",
-    description: "Combine multiple inputs",
-    icon: Merge,
-    category: "Utility",
-    badge: "Coming Soon",
-    disabled: true,
-  },
-];
-
-const CATEGORIES = [
-  { name: "Control", description: "Workflow control nodes" },
-  { name: "Input", description: "Data input nodes" },
-  { name: "AI", description: "AI processing nodes" },
-  { name: "Output", description: "Result output nodes" },
-  { name: "Utility", description: "Helper utility nodes" },
-];
+import { CATEGORIES, NODE_TYPES } from "@/components/session/NodeLibrary";
 
 // Add this function before the Canvas component
 const getNodeColor = (node: CustomNode) => {
@@ -145,6 +74,21 @@ const getNodeStrokeColor = (node: CustomNode) => {
   }
 };
 
+const getDefaultEdgeOptions = (isDarkMode: boolean): DefaultEdgeOptions => {
+  return {
+    // type: "smoothstep",
+    animated: false,
+    style: {
+      stroke: isDarkMode ? "#e5e7eb" : "#6b7280",
+      strokeWidth: 2,
+    },
+    // markerEnd: {
+    //   type: MarkerType.ArrowClosed,
+    //   color: isDarkMode ? "#e5e7eb" : "#6b7280",
+    // },
+  };
+};
+
 export default function Canvas() {
   const {
     nodes,
@@ -163,6 +107,10 @@ export default function Canvas() {
 
   // Convert theme to React Flow ColorMode
   const colorMode: ColorMode = resolvedTheme === "dark" ? "dark" : "light";
+  const isDarkMode = resolvedTheme === "dark";
+
+  // Get default edge options based on theme
+  const defaultEdgeOptions = getDefaultEdgeOptions(isDarkMode);
 
   // Initialize with demo nodes if empty (only on first mount, not during session loading)
   useEffect(() => {
@@ -402,7 +350,7 @@ export default function Canvas() {
   })).filter((category) => category.nodes.length > 0);
 
   return (
-    <div ref={canvasRef} className="relative w-full pl-16 h-full">
+    <div ref={canvasRef} className="relative w-full h-full">
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div className="w-full h-full">
@@ -416,6 +364,7 @@ export default function Canvas() {
               colorMode={colorMode}
               proOptions={{ hideAttribution: true }}
               fitView
+              defaultEdgeOptions={defaultEdgeOptions}
             >
               <Controls />
               <MiniMap
