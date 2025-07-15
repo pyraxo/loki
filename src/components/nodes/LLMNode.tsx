@@ -64,7 +64,7 @@ export function LLMInvocationNode({
   const handleMaxTokensChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
     updateNodeData(id, {
-      maxTokens: Math.min(Math.max(value, 1), 4000),
+      maxTokens: Math.min(Math.max(value, 1), 10000),
     });
   };
 
@@ -139,7 +139,7 @@ export function LLMInvocationNode({
             onMouseDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             min={1}
-            max={4000}
+            max={10000}
             className="w-full"
           />
         </div>

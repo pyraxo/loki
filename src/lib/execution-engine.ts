@@ -111,6 +111,14 @@ export class ExecutionEngine {
           break;
 
         case NodeType.LLM_INVOCATION:
+          // Check if LLM node has any inputs - if not, skip execution
+          const llmInputNodes = this.getInputNodes(node.id, edges, nodes);
+          if (llmInputNodes.length === 0) {
+            // Skip execution but mark as completed - maintain original idle state
+            state.updateNodeStatus(node.id, "idle");
+            break;
+          }
+
           // Reset connected output nodes before starting LLM execution
           this.resetConnectedOutputNodes(node.id, edges, nodes);
           await this.executeLLMNode(node, edges, nodes);
@@ -294,7 +302,7 @@ export class ExecutionEngine {
         const currentState = useStore.getState() as any;
         const currentNodes = currentState.nodes;
 
-        const readyNodes = nodesToExecute.filter((node) => {
+        const readyNodes = nodesToExecute.filter((node: CustomNode) => {
           if (executedNodes.has(node.id)) return false;
 
           // Start nodes can always execute
@@ -316,7 +324,7 @@ export class ExecutionEngine {
         if (readyNodes.length === 0) {
           // Check if we have remaining nodes but none are ready
           const remainingNodes = nodesToExecute.filter(
-            (node) => !executedNodes.has(node.id)
+            (node: CustomNode) => !executedNodes.has(node.id)
           );
           if (remainingNodes.length > 0) {
             throw new Error(
@@ -328,7 +336,7 @@ export class ExecutionEngine {
 
         // Execute ready nodes in parallel
         await Promise.all(
-          readyNodes.map(async (node) => {
+          readyNodes.map(async (node: CustomNode) => {
             if (this.abortController?.signal.aborted) {
               throw new Error("Workflow execution aborted");
             }

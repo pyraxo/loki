@@ -14,18 +14,10 @@ import { useResolvedTheme } from "@/hooks/use-theme-sync";
 import { useStore } from "@/lib/store";
 import type { CustomNode } from "@/types/nodes";
 import { NodeType } from "@/types/nodes";
-import {
-  Brain,
-  FileOutput,
-  GitBranch,
-  Merge,
-  MessageSquare,
-  Play,
-  Plus,
-  Timer,
-} from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 
+import { CATEGORIES, NODE_TYPES } from "@/components/session/NodeLibrary";
 import {
   Background,
   BackgroundVariant,
@@ -37,12 +29,11 @@ import {
   applyNodeChanges,
   type ColorMode,
   type Connection,
+  type DefaultEdgeOptions,
   type EdgeChange,
   type NodeChange,
-  type DefaultEdgeOptions,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { CATEGORIES, NODE_TYPES } from "@/components/session/NodeLibrary";
 
 // Add this function before the Canvas component
 const getNodeColor = (node: CustomNode) => {

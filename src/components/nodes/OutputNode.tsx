@@ -32,7 +32,7 @@ export function OutputNode({ data, selected }: NodeProps<OutputNode>) {
         {/* Content Display */}
         <div className="flex-1 min-h-0 flex">
           {hasContent ? (
-            <ScrollArea className="w-full h-full rounded border bg-muted/50">
+            <ScrollArea className="w-full h-full rounded border bg-muted/50 select-text">
               <div className="p-3 h-full">
                 <pre className="text-sm whitespace-pre-wrap font-mono">
                   {displayContent}

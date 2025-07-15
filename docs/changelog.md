@@ -39,6 +39,11 @@
 - **Fixed Content Clearing**: Eliminated unwanted content clearing on workflow restart - content now persists until new data arrives
 - **Fixed Error Propagation**: Errors now properly propagate to all connected output nodes with appropriate cleanup
 
+#### LLM Node Execution Issues
+
+- **Fixed Unconnected LLM Node Errors**: LLM nodes with no input connections now maintain their original "idle" state instead of throwing errors during workflow execution
+- **Improved Execution Flow**: Modified execution engine to skip LLM nodes without inputs while properly marking them as completed for workflow continuation
+
 #### Session Error Management
 
 - **Automatic Error Clearing**: Session errors are now automatically cleared when starting a new workflow execution, preventing stale error messages from persisting in the session tab

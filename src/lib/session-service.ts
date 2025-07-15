@@ -1,12 +1,12 @@
-import { Store } from "@tauri-apps/plugin-store";
+import { type CustomNode } from "@/types/nodes";
 import {
   type Session,
-  type SessionMetadata,
-  type SessionExport,
   type SessionBulkExport,
+  type SessionExport,
+  type SessionMetadata,
   SessionStatus,
 } from "@/types/sessions";
-import { type CustomNode } from "@/types/nodes";
+import { Store } from "@tauri-apps/plugin-store";
 import { type Edge } from "@xyflow/react";
 
 const SESSION_STORE_KEY = "loki-sessions.json";

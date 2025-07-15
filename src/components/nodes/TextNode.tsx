@@ -31,14 +31,14 @@ export function TextPromptNode({
       minHeight={240}
       selected={selected}
     >
-      <div className="space-y-3">
+      <div className="space-y-3 flex-1 min-h-0 flex flex-col">
         <Textarea
           value={localText}
           onChange={handleTextChange}
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           placeholder="Enter your prompt here..."
-          className="min-h-[100px] resize-none"
+          className="min-h-[100px] resize-none select-text flex-1"
         />
         <div className="flex justify-between items-center text-xs text-muted-foreground">
           <span>{data.characterCount || 0} characters</span>
