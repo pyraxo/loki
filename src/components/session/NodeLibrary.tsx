@@ -23,9 +23,11 @@ interface NodeTypeInfo {
   icon: React.ComponentType<{ className?: string }>;
   category: string;
   badge?: string;
+  shortcut?: string;
+  disabled?: boolean;
 }
 
-const NODE_TYPES: NodeTypeInfo[] = [
+export const NODE_TYPES: NodeTypeInfo[] = [
   {
     type: NodeType.START,
     name: "Start",
@@ -62,7 +64,7 @@ const NODE_TYPES: NodeTypeInfo[] = [
     description: "Branch workflow based on conditions",
     icon: GitBranch,
     category: "Control",
-    badge: "Coming Soon",
+    badge: "WIP",
   },
   {
     type: "DELAY" as NodeType,
@@ -70,7 +72,7 @@ const NODE_TYPES: NodeTypeInfo[] = [
     description: "Add time delay between operations",
     icon: Timer,
     category: "Utility",
-    badge: "Coming Soon",
+    badge: "WIP",
   },
   {
     type: "MERGE" as NodeType,
@@ -78,11 +80,11 @@ const NODE_TYPES: NodeTypeInfo[] = [
     description: "Combine multiple inputs",
     icon: Merge,
     category: "Utility",
-    badge: "Coming Soon",
+    badge: "WIP",
   },
 ];
 
-const CATEGORIES = [
+export const CATEGORIES = [
   { name: "Control", description: "Workflow control nodes" },
   { name: "Input", description: "Data input nodes" },
   { name: "AI", description: "AI processing nodes" },
@@ -96,7 +98,7 @@ interface NodeItemProps {
 
 function NodeItem({ nodeType }: NodeItemProps) {
   const Icon = nodeType.icon;
-  const isDisabled = nodeType.badge === "Coming Soon";
+  const isDisabled = nodeType.badge === "WIP";
 
   const handleDragStart = (e: React.DragEvent) => {
     if (isDisabled) {
