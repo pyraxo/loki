@@ -39,6 +39,7 @@ export default function SessionItem({
     renameSession,
     exportSession,
     showRenameDialog,
+    showConfirmationDialog,
   } = useStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -57,13 +58,13 @@ export default function SessionItem({
     }
   };
 
-  const handleDelete = async () => {
-    setShowDeleteDialog(true);
-  };
-
   const confirmDelete = async () => {
-    await deleteSession(session.id);
-    setShowDeleteDialog(false);
+    showConfirmationDialog(
+      "Delete Session",
+      `Are you sure you want to delete "${session.name}"? This action cannot be undone.`,
+      () => deleteSession(session.id),
+      "Delete"
+    );
   };
 
   const handleDuplicate = async () => {
@@ -191,7 +192,7 @@ export default function SessionItem({
           </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
-            onClick={handleDelete}
+            onClick={confirmDelete}
             className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
           >
             <span>Delete</span>

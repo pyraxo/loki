@@ -306,7 +306,8 @@ export function useSessionShortcuts() {
           showConfirmationDialog(
             "Delete Session",
             `Are you sure you want to delete "${currentSession.name}"? This action cannot be undone.`,
-            () => deleteSession(activeSessionId)
+            () => deleteSession(activeSessionId),
+            "Delete"
           );
         }
       }

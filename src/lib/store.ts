@@ -44,6 +44,7 @@ interface CanvasState {
     isOpen: boolean;
     title: string;
     description: string;
+    confirmText?: string;
     onConfirm: (() => void) | null;
   };
 
@@ -130,7 +131,8 @@ interface CanvasState {
   showConfirmationDialog: (
     title: string,
     description: string,
-    onConfirm: () => void
+    onConfirm: () => void,
+    confirmText?: string
   ) => void;
   hideConfirmationDialog: () => void;
 
@@ -199,6 +201,7 @@ export const useStore = create<CanvasState>((set, get) => ({
     title: "",
     description: "",
     onConfirm: null,
+    confirmText: "Delete",
   },
 
   // Initial rename dialog state
@@ -391,7 +394,11 @@ export const useStore = create<CanvasState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const session = await sessionService.createSession(name, initialNodes, initialEdges);
+      const session = await sessionService.createSession(
+        name,
+        initialNodes,
+        initialEdges
+      );
 
       const { sessions } = get();
       set({
@@ -790,7 +797,8 @@ export const useStore = create<CanvasState>((set, get) => ({
   showConfirmationDialog: (
     title: string,
     description: string,
-    onConfirm: () => void
+    onConfirm: () => void,
+    confirmText?: string
   ) => {
     set({
       confirmationDialog: {
@@ -798,6 +806,7 @@ export const useStore = create<CanvasState>((set, get) => ({
         title,
         description,
         onConfirm,
+        confirmText,
       },
     });
   },
