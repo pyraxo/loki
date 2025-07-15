@@ -1,13 +1,14 @@
+import SidebarFooterComponent from "@/components/sidebar-footer";
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
   SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SessionList from "./session/SessionList";
 import NodeLibrary from "./session/NodeLibrary";
-import SidebarFooterComponent from "@/components/sidebar-footer";
+import SessionList from "./session/SessionList";
 
 export default function LeftSidebar() {
   return (
@@ -38,6 +39,7 @@ export default function LeftSidebar() {
       <SidebarFooter className="p-0">
         <SidebarFooterComponent />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }
