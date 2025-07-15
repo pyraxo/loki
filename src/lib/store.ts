@@ -2,7 +2,8 @@ import { initialEdges, initialNodes } from "@/components/nodes/defaults";
 import {
   type BaseNodeData,
   type CustomNode,
-  type WorkflowState,
+  type TextPromptNodeData,
+  type WorkflowState
 } from "@/types/nodes";
 import {
   type Session,
@@ -84,6 +85,11 @@ interface CanvasState {
     status: "idle" | "running" | "success" | "error",
     error?: string
   ) => void;
+
+  // Text node history management (save points only)
+  undoTextChange: (nodeId: string) => boolean;
+  redoTextChange: (nodeId: string) => boolean;
+  captureTextHistoryAtSavePoint: () => void;
 
   // Workflow actions
   startWorkflow: () => void;
@@ -279,6 +285,195 @@ export const useStore = create<CanvasState>((set, get) => ({
     set({ nodes: updatedNodes });
   },
 
+  // Text node history management (save points only)
+  undoTextChange: (nodeId: string) => {
+    try {
+      const { nodes } = get();
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node || node.type !== "textPrompt") {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[undoTextChange] Node ${nodeId} not found or not a text prompt`);
+        }
+        return false;
+      }
+      const textNodeData = node.data as TextPromptNodeData;
+      if (!textNodeData.history || textNodeData.history.undoStack.length === 0) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[undoTextChange] No history available for ${nodeId}`);
+        }
+        return false;
+      }
+
+      const history = textNodeData.history;
+
+      // Move current state to redo stack
+      if (!history.redoStack) {
+        history.redoStack = [];
+      }
+      history.redoStack.push({
+        timestamp: Date.now(),
+        text: textNodeData.text,
+      });
+
+      // Get previous state from undo stack
+      const lastEntry = history.undoStack.pop();
+      if (lastEntry) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[undoTextChange] Undoing ${nodeId}: "${textNodeData.text}" -> "${lastEntry.text}"`);
+        }
+
+        // Create properly updated nodes array with immutable updates
+        const updatedNodes = nodes.map((n) =>
+          n.id === nodeId
+            ? {
+              ...n,
+              data: {
+                ...n.data,
+                text: lastEntry.text,
+                characterCount: lastEntry.text.length,
+                history: {
+                  ...history,
+                  undoStack: [...history.undoStack],
+                  redoStack: [...history.redoStack],
+                },
+              },
+            }
+            : n
+        ) as CustomNode[];
+
+        // Limit redo stack size
+        if (history.redoStack.length > 100) {
+          history.redoStack.shift();
+        }
+
+        set({ nodes: updatedNodes, hasUnsavedChanges: true });
+        get().markSessionAsUnsaved();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(`[undoTextChange] Error during undo for ${nodeId}:`, error);
+      return false;
+    }
+  },
+
+  redoTextChange: (nodeId: string) => {
+    try {
+      const { nodes } = get();
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node || node.type !== "textPrompt") {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[redoTextChange] Node ${nodeId} not found or not a text prompt`);
+        }
+        return false;
+      }
+      const textNodeData = node.data as TextPromptNodeData;
+      if (!textNodeData.history || textNodeData.history.redoStack.length === 0) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[redoTextChange] No redo history available for ${nodeId}`);
+        }
+        return false;
+      }
+
+      const history = textNodeData.history;
+
+      // Move current state to undo stack
+      if (!history.undoStack) {
+        history.undoStack = [];
+      }
+      history.undoStack.push({
+        timestamp: Date.now(),
+        text: textNodeData.text,
+      });
+
+      // Get next state from redo stack
+      const nextEntry = history.redoStack.pop();
+      if (nextEntry) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[redoTextChange] Redoing ${nodeId}: "${textNodeData.text}" -> "${nextEntry.text}"`);
+        }
+
+        // Create properly updated nodes array with immutable updates
+        const updatedNodes = nodes.map((n) =>
+          n.id === nodeId
+            ? {
+              ...n,
+              data: {
+                ...n.data,
+                text: nextEntry.text,
+                characterCount: nextEntry.text.length,
+                history: {
+                  ...history,
+                  undoStack: [...history.undoStack],
+                  redoStack: [...history.redoStack],
+                },
+              },
+            }
+            : n
+        ) as CustomNode[];
+
+        // Limit undo stack size
+        if (history.undoStack.length > 100) {
+          history.undoStack.shift();
+        }
+
+        set({ nodes: updatedNodes, hasUnsavedChanges: true });
+        get().markSessionAsUnsaved();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(`[redoTextChange] Error during redo for ${nodeId}:`, error);
+      return false;
+    }
+  },
+
+  captureTextHistoryAtSavePoint: () => {
+    const { nodes } = get();
+    const updatedNodes = nodes.map((node) => {
+      if (node.type === "textPrompt") {
+        const textNodeData = node.data as TextPromptNodeData;
+        if (textNodeData.text) {
+          // Initialize history if it doesn't exist
+          if (!textNodeData.history) {
+            textNodeData.history = {
+              undoStack: [],
+              redoStack: [],
+            };
+          }
+
+          const history = textNodeData.history;
+
+          // Add current text to history when saving
+          const newUndoStack = [...history.undoStack];
+          newUndoStack.push({
+            timestamp: Date.now(),
+            text: textNodeData.text,
+          });
+
+          // Limit history size
+          if (newUndoStack.length > 100) {
+            newUndoStack.shift();
+          }
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              history: {
+                undoStack: newUndoStack,
+                redoStack: [], // Clear redo stack at save point
+              },
+            },
+          };
+        }
+      }
+      return node;
+    }) as CustomNode[];
+
+    set({ nodes: updatedNodes });
+  },
+
   // Workflow actions
   startWorkflow: () => {
     set({
@@ -462,6 +657,9 @@ export const useStore = create<CanvasState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
+      // Capture history at save point before saving
+      get().captureTextHistoryAtSavePoint();
+
       const currentSession = sessions[targetSessionId];
       if (!currentSession) {
         throw new Error("Session not found");
@@ -915,7 +1113,9 @@ export const useStore = create<CanvasState>((set, get) => ({
       await get().updateSettings({ theme });
 
       // The actual DOM theme application will be handled by the useThemeSync hook
-      console.log(`Theme set to: ${theme}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Theme set to: ${theme}`);
+      }
     } catch (error) {
       console.error("Failed to set theme:", error);
       throw error;
@@ -930,7 +1130,9 @@ export const useStore = create<CanvasState>((set, get) => ({
       // Initialize the theme service
       await themeService.initializeTheme();
 
-      console.log("Theme initialized");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Theme initialized");
+      }
     } catch (error) {
       console.error("Failed to initialize theme:", error);
     }

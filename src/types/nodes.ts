@@ -12,7 +12,20 @@ export interface BaseNodeData {
 export type TextPromptNodeData = {
   text: string;
   characterCount?: number;
+  history?: TextHistory;
 } & BaseNodeData;
+
+// History management for text nodes
+export interface TextHistory {
+  undoStack: TextHistoryEntry[];
+  redoStack: TextHistoryEntry[];
+}
+
+// History entry for text nodes
+export interface TextHistoryEntry {
+  text: string;
+  timestamp: number;
+}
 
 export type LLMInvocationNodeData = {
   model: string;

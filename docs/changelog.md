@@ -4,6 +4,18 @@
 
 ### ✨ Major Features
 
+#### Text Node Edit History with Undo/Redo
+
+- **Independent Node History**: Each text node maintains its own edit history stack
+- **Smart Keyboard Shortcuts**:
+  - `Ctrl/Cmd+Z`: Undo to previous save point (when node is selected)
+  - `Ctrl/Cmd+Shift+Z`: Redo to next save point (when node is selected)
+  - `Ctrl/Cmd+Y`: Alternative redo shortcut
+- **Context-Aware Operation**: Only works when node is selected but textarea is not focused
+- **Native Textarea Support**: Preserves built-in undo/redo when actively typing
+- **Save Point History**: History snapshots only captured when workflows are saved (auto-save or manual Ctrl/Cmd+S)
+- **Memory Management**: History limited to 100 save points per node to prevent memory issues
+
 #### LLM Workflow Execution System
 
 - **Multiple Output Streaming**: LLM nodes now stream to ALL connected output nodes simultaneously
@@ -36,6 +48,14 @@
 - **Automatic Error Clearing**: Session errors clear when starting new workflows
 - **Fixed Text Node Data Loss**: Text input now persists across app reloads
 - **Fixed Session Loading**: Sessions no longer immediately mark as unsaved when clicked
+
+#### Text Node History Synchronization
+
+- **Fixed Text Appending Issue**: Resolved issue where undo/redo operations would append text instead of replacing it after switching sessions
+- **Improved Store Mutations**: All text history operations now properly update nodes immutably
+- **Enhanced Synchronization**: TextNode component now properly syncs with store updates to prevent race conditions
+- **Better Error Handling**: Added comprehensive error handling and debugging for history operations
+- **Optimized History Capture**: Changed from capturing every keystroke to only capturing history at save points for better performance and more meaningful undo/redo operations
 
 ---
 
