@@ -1,18 +1,21 @@
 import { type BaseNodeData, type CustomNode, type WorkflowState } from "@/types/nodes";
 import { type Session, type SessionMetadata } from "@/types/sessions";
 import { type AppSettings, type LLMProvider, type ProviderSettings, type ThemeMode } from "@/types/settings";
-import { type Edge } from "@xyflow/react";
+import { type Edge, type Viewport } from "@xyflow/react";
 
 // Canvas slice types
 export interface CanvasSlice {
   nodes: CustomNode[];
   edges: Edge[];
+  viewport: Viewport;
   hasUnsavedChanges: boolean;
 
   setNodes: (nodes: CustomNode[]) => void;
   setEdges: (edges: Edge[]) => void;
+  setViewport: (viewport: Viewport) => void;
   setNodesInternal: (nodes: CustomNode[]) => void;
   setEdgesInternal: (edges: Edge[]) => void;
+  setViewportInternal: (viewport: Viewport) => void;
   updateNodeData: (nodeId: string, data: Partial<BaseNodeData & Record<string, any>>) => void;
   updateNodeDataDuringExecution: (nodeId: string, data: Partial<BaseNodeData & Record<string, any>>) => void;
   updateNodeStatus: (nodeId: string, status: "idle" | "running" | "success" | "error", error?: string) => void;

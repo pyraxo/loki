@@ -5,6 +5,7 @@ import { type StoreState } from "../types";
 export const selectCanvasState = (state: StoreState) => ({
   nodes: state.nodes,
   edges: state.edges,
+  viewport: state.viewport,
   hasUnsavedChanges: state.hasUnsavedChanges,
 });
 

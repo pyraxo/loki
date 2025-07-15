@@ -1,5 +1,5 @@
 import { type BaseNodeData, type CustomNode } from "@/types/nodes";
-import { type Edge } from "@xyflow/react";
+import { type Edge, type Viewport } from "@xyflow/react";
 import { type StateCreator } from "zustand";
 import { type CanvasSlice, type StoreState } from "../types";
 
@@ -12,6 +12,7 @@ export const createCanvasSlice: StateCreator<
   // Initial state
   nodes: [],
   edges: [],
+  viewport: { x: 0, y: 0, zoom: 1 },
   hasUnsavedChanges: false,
 
   // Canvas actions
@@ -25,6 +26,11 @@ export const createCanvasSlice: StateCreator<
     get().markSessionAsUnsaved();
   },
 
+  setViewport: (viewport: Viewport) => {
+    set({ viewport, hasUnsavedChanges: true });
+    get().markSessionAsUnsaved();
+  },
+
   // Internal setters for React Flow changes (don't mark as unsaved)
   setNodesInternal: (nodes: CustomNode[]) => {
     set({ nodes });
@@ -32,6 +38,10 @@ export const createCanvasSlice: StateCreator<
 
   setEdgesInternal: (edges: Edge[]) => {
     set({ edges });
+  },
+
+  setViewportInternal: (viewport: Viewport) => {
+    set({ viewport });
   },
 
   updateNodeData: (

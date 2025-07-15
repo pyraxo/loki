@@ -1,5 +1,5 @@
+import { type Edge, type Viewport } from "@xyflow/react";
 import { type CustomNode } from "./nodes";
-import { type Edge } from "@xyflow/react";
 
 // Session status enumeration
 export enum SessionStatus {
@@ -15,6 +15,7 @@ export interface Session {
   name: string;
   nodes: CustomNode[];
   edges: Edge[];
+  viewport?: Viewport;
   metadata: SessionMetadata;
   createdAt: string;
   updatedAt: string;

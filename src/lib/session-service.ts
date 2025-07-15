@@ -7,7 +7,7 @@ import {
   SessionStatus,
 } from "@/types/sessions";
 import { Store } from "@tauri-apps/plugin-store";
-import { type Edge } from "@xyflow/react";
+import { type Edge, type Viewport } from "@xyflow/react";
 
 const SESSION_STORE_KEY = "loki-sessions.json";
 
@@ -61,7 +61,8 @@ class SessionService {
   async createSession(
     name?: string,
     nodes: CustomNode[] = [],
-    edges: Edge[] = []
+    edges: Edge[] = [],
+    viewport?: Viewport
   ): Promise<Session> {
     const store = await this.ensureStore();
 
@@ -77,6 +78,7 @@ class SessionService {
       name: sessionName,
       nodes,
       edges,
+      viewport: viewport || { x: 0, y: 0, zoom: 1 },
       metadata: {
         status: SessionStatus.SAVED,
         nodeCount: nodes.length,

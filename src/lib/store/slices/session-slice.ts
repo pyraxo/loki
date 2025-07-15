@@ -23,10 +23,12 @@ export const createSessionSlice: StateCreator<
     set({ isLoading: true, error: null });
 
     try {
+      const { viewport } = get();
       const session = await sessionService.createSession(
         name,
         initialNodes,
-        initialEdges
+        initialEdges,
+        viewport
       );
 
       const { sessions } = get();
@@ -59,6 +61,7 @@ export const createSessionSlice: StateCreator<
       set({
         nodes: session.nodes,
         edges: session.edges,
+        viewport: session.viewport || { x: 0, y: 0, zoom: 1 },
         activeSessionId: sessionId,
         hasUnsavedChanges: false,
         workflow: {
@@ -81,7 +84,7 @@ export const createSessionSlice: StateCreator<
   },
 
   saveSession: async (sessionId?: string): Promise<void> => {
-    const { activeSessionId, nodes, edges, sessions } = get();
+    const { activeSessionId, nodes, edges, viewport, sessions } = get();
     const targetSessionId = sessionId || activeSessionId;
 
     if (!targetSessionId) {
@@ -103,6 +106,7 @@ export const createSessionSlice: StateCreator<
         ...currentSession,
         nodes: [...nodes],
         edges: [...edges],
+        viewport: { ...viewport },
         updatedAt: new Date().toISOString(),
         metadata: {
           ...currentSession.metadata,

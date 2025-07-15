@@ -32,6 +32,7 @@ import {
   type DefaultEdgeOptions,
   type EdgeChange,
   type NodeChange,
+  type Viewport,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -84,10 +85,13 @@ export default function Canvas() {
   const {
     nodes,
     edges,
+    viewport,
     setNodes,
     setEdges,
+    setViewport,
     setNodesInternal,
     setEdgesInternal,
+    setViewportInternal,
     activeSessionId,
     isLoading,
     createSession,
@@ -231,7 +235,7 @@ export default function Canvas() {
   // Global keyboard shortcuts for canvas
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+      // const isCtrlOrCmd = event.ctrlKey || event.metaKey;
 
       // Delete selected nodes/edges
       if (event.key === "Delete" || event.key === "Backspace") {
@@ -300,6 +304,13 @@ export default function Canvas() {
     [edges, setEdges]
   );
 
+  const onViewportChange = useCallback(
+    (viewport: Viewport) => {
+      setViewportInternal(viewport);
+    },
+    [setViewportInternal]
+  );
+
   // Handle creating a new session and loading it
   const handleCreateSession = async () => {
     try {
@@ -352,9 +363,10 @@ export default function Canvas() {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onViewportChange={onViewportChange}
+              viewport={viewport}
               colorMode={colorMode}
               proOptions={{ hideAttribution: true }}
-              fitView
               defaultEdgeOptions={defaultEdgeOptions}
             >
               <Controls />
