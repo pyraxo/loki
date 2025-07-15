@@ -9,6 +9,7 @@ alwaysApply: true
 - **src/** – React + TypeScript frontend code.
   - **components/** – Reusable UI components and node definitions.
   - **lib/** – Shared utilities, Zustand store, global state helpers.
+    - **store/** – Modular Zustand store architecture with slices.
   - **pages/** – Route-level components (Index.tsx, NotFound.tsx).
   - **hooks/** – Custom React hooks.
 - **src-tauri/** – Rust backend for Tauri:
@@ -17,10 +18,65 @@ alwaysApply: true
 - **docs/** – Internal documentation (PRD, architecture notes, nodes documentation, changelog).
 - **.cursor/rules/** – Cursor rule files like this one.
 
+## Store Architecture
+
+Global state is managed using a **slice-based Zustand store** in `src/lib/store/`:
+
+```
+src/lib/store/
+├── index.ts              # Main store composition
+├── types.ts              # Store type definitions
+├── slices/
+│   ├── canvas-slice.ts   # Node/edge management
+│   ├── workflow-slice.ts # Workflow execution state
+│   ├── session-slice.ts  # Session CRUD operations
+│   ├── settings-slice.ts # Settings & theme management
+│   ├── dialog-slice.ts   # Dialog states
+│   ├── history-slice.ts  # Text history/undo-redo
+│   └── autosave-slice.ts # Auto-save functionality
+└── utils/
+    ├── selectors.ts      # Reusable selectors
+    └── store-utils.ts    # Helper functions
+```
+
+### Key Store Slices
+
+- **Canvas**: Manages React Flow nodes, edges, and canvas operations
+- **Workflow**: Handles workflow execution, node completion tracking
+- **Session**: CRUD operations, search, export/import, metadata
+- **Settings**: App settings, provider configs, theme management
+- **Dialog**: UI dialogs (confirmation, rename, settings)
+- **History**: Text node edit history with undo/redo
+- **Auto-save**: Auto-save logic and unsaved change tracking
+
+### Store Usage
+
+```typescript
+// Basic usage (backward compatible)
+import { useStore } from "@/lib/store";
+const { nodes, setNodes, createSession } = useStore();
+
+// Optimized usage with selectors
+import { selectCanvasState, selectActiveSession } from "@/lib/store";
+const canvasState = useStore(selectCanvasState);
+const activeSession = useStore(selectActiveSession);
+```
+
 ## Navigation Tips
 
 - When searching for frontend logic, start in `src/components/` or `src/lib/`.
-- Node implementations live in `src/components/nodes.tsx`; add new node types here.
-- Global state is managed in `src/lib/store.ts` using Zustand.
+- Node implementations live in `src/components/nodes/`; add new node types here.
+- Store slices are in `src/lib/store/slices/`; each handles a specific domain.
+- Store utilities and selectors are in `src/lib/store/utils/`.
 - Rust commands exposed to the frontend are defined in `src-tauri/src/main.rs`.
 - Documentation lives in `docs/` – update PRD & architecture docs here.
+- Store documentation is in `docs/api/store.md` with comprehensive examples.
+
+## Store Development Guidelines
+
+- Use **selectors** for optimized re-renders instead of subscribing to entire store
+- Use appropriate actions: `setNodes()` for user changes, `setNodesInternal()` for React Flow updates
+- Handle async operations with proper error handling
+- Use provided utilities in `store-utils.ts` for common operations
+- Each slice is testable in isolation for better test coverage
+- Store maintains 100% backward compatibility with existing code
