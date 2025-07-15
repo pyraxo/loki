@@ -123,59 +123,61 @@ export default function SessionItem({
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <div
-            className={`group relative flex items-center gap-3 rounded-lg p-3 transition-colors cursor-pointer ${
-              isActive
-                ? "bg-accent text-accent-foreground"
-                : "hover:bg-muted/50"
-            }`}
-            onClick={onClick}
-          >
-            {/* Status Indicator */}
-            <div className="relative flex-shrink-0">
-              <div
-                className={`h-2 w-2 rounded-full ${getStatusColor(
-                  session.metadata.status
-                )}`}
-              />
-            </div>
+          {session.metadata && (
+            <div
+              className={`group relative flex items-center gap-3 rounded-lg p-3 transition-colors cursor-pointer ${
+                isActive
+                  ? "bg-accent text-accent-foreground"
+                  : "hover:bg-muted/50"
+              }`}
+              onClick={onClick}
+            >
+              {/* Status Indicator */}
+              <div className="relative flex-shrink-0">
+                <div
+                  className={`h-2 w-2 rounded-full ${getStatusColor(
+                    session.metadata.status
+                  )}`}
+                />
+              </div>
 
-            {/* Session Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-sm truncate">
-                  {session.name}
-                </span>
-                {session.metadata.hasUnsavedChanges && (
-                  <Badge variant="secondary" className="text-xs">
-                    Unsaved
-                  </Badge>
+              {/* Session Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium text-sm truncate">
+                    {session.name}
+                  </span>
+                  {session.metadata.hasUnsavedChanges && (
+                    <Badge variant="secondary" className="text-xs">
+                      Unsaved
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <FileText className="h-3 w-3" />
+                    <span>{session.metadata.nodeCount} nodes</span>
+                  </div>
+                  <div className="flex items-center gap-1 min-w-0">
+                    <Clock className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">
+                      {formatLastUpdated(session.updatedAt)}
+                    </span>
+                  </div>
+                </div>
+
+                {session.metadata.errorMessage && (
+                  <div className="text-xs text-red-600 mt-1 truncate">
+                    Error:{" "}
+                    {session.metadata.errorMessage.length > 20
+                      ? session.metadata.errorMessage.slice(0, 20) + "..."
+                      : session.metadata.errorMessage}
+                  </div>
                 )}
               </div>
-
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <FileText className="h-3 w-3" />
-                  <span>{session.metadata.nodeCount} nodes</span>
-                </div>
-                <div className="flex items-center gap-1 min-w-0">
-                  <Clock className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">
-                    {formatLastUpdated(session.updatedAt)}
-                  </span>
-                </div>
-              </div>
-
-              {session.metadata.errorMessage && (
-                <div className="text-xs text-red-600 mt-1 truncate">
-                  Error:{" "}
-                  {session.metadata.errorMessage.length > 20
-                    ? session.metadata.errorMessage.slice(0, 20) + "..."
-                    : session.metadata.errorMessage}
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-48">
           <ContextMenuItem onClick={handleRename}>

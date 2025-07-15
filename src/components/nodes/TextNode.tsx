@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
 import { type TextPromptNode } from "@/types/nodes";
 import { type NodeProps } from "@xyflow/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function TextPromptNode({
   data,
@@ -12,6 +12,11 @@ export function TextPromptNode({
 }: NodeProps<TextPromptNode>) {
   const { updateNodeData } = useStore();
   const [localText, setLocalText] = useState(data.text);
+
+  // Sync local state with store data when it changes
+  useEffect(() => {
+    setLocalText(data.text);
+  }, [data.text]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;

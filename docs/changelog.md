@@ -50,6 +50,11 @@
 - **Enhanced Stream Coordination**: Multiple output nodes now show synchronized streaming indicators and content
 - **Fixed Session Status During Execution**: Resolved issue where streaming updates marked sessions as "unsaved" (yellow) instead of preserving "workflow running" (blue) status
 
+#### Text Node Persistence
+
+- **Fixed Text Node Data Loss**: Resolved issue where text entered in text nodes was lost when the app refreshed, reverting to the default "Write a short poem about coding" text
+- **Improved State Synchronization**: Added proper synchronization between local component state and store data to ensure text persists across app reloads
+
 ### 🏗️ Technical Improvements
 
 #### Execution Flow
