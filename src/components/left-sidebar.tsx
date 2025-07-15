@@ -11,7 +11,7 @@ import SidebarFooterComponent from "@/components/sidebar-footer";
 
 export default function LeftSidebar() {
   return (
-    <Sidebar className="w-80">
+    <Sidebar className="select-none" collapsible="offcanvas">
       <SidebarHeader className="pt-4"></SidebarHeader>
 
       <SidebarContent className="p-0">
