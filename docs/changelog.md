@@ -4,6 +4,22 @@
 
 ### ✨ Major Features
 
+#### Store Architecture Refactoring
+
+- **Modular Store Structure**: Refactored monolithic 1282-line store into focused slices
+- **Slice-Based Organization**:
+  - `canvas-slice.ts`: Node and edge management
+  - `workflow-slice.ts`: Workflow execution state
+  - `session-slice.ts`: Session CRUD operations
+  - `settings-slice.ts`: Settings and theme management
+  - `dialog-slice.ts`: Dialog state management
+  - `history-slice.ts`: Text node history management
+  - `autosave-slice.ts`: Auto-save functionality
+- **Enhanced Type Safety**: Improved TypeScript support with dedicated slice interfaces
+- **Utility Functions**: Added selectors and helper functions for common operations
+- **Backward Compatibility**: Legacy `store.ts` imports still work seamlessly
+- **Better Maintainability**: Easier to test, debug, and extend individual features
+
 #### Text Node Edit History with Undo/Redo
 
 - **Independent Node History**: Each text node maintains its own edit history stack
@@ -56,6 +72,7 @@
 - **Enhanced Synchronization**: TextNode component now properly syncs with store updates to prevent race conditions
 - **Better Error Handling**: Added comprehensive error handling and debugging for history operations
 - **Optimized History Capture**: Changed from capturing every keystroke to only capturing history at save points for better performance and more meaningful undo/redo operations
+- **Smart History Filtering**: Empty changes and duplicate saves no longer create unnecessary history entries
 
 ---
 
