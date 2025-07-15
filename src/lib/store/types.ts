@@ -102,9 +102,9 @@ export interface DialogSlice {
   hideConfirmationDialog: () => void;
   showRenameDialog: (title: string, currentValue: string, onConfirm: (newName: string) => void) => void;
   hideRenameDialog: () => void;
-  openSettingsDialog: (tab?: string) => void;
-  closeSettingsDialog: () => void;
-  toggleSettingsDialog: () => void;
+  openSettingsDialog: (tab?: string) => Promise<void>;
+  closeSettingsDialog: () => Promise<void>;
+  toggleSettingsDialog: () => Promise<void>;
 }
 
 // History slice types
@@ -112,13 +112,15 @@ export interface HistorySlice {
   addTextHistoryEntry: (nodeId: string, text: string) => void;
   undoTextChange: (nodeId: string) => boolean;
   redoTextChange: (nodeId: string) => boolean;
+  clearTextHistory: (nodeId: string) => void;
+  canUndo: (nodeId: string) => boolean;
+  canRedo: (nodeId: string) => boolean;
   captureTextHistoryAtSavePoint: () => void;
 }
 
 // Auto-save slice types
 export interface AutoSaveSlice {
   autoSaveEnabled: boolean;
-
   enableAutoSave: () => void;
   disableAutoSave: () => void;
   triggerAutoSave: () => Promise<void>;

@@ -4,6 +4,19 @@
 
 ### ✨ Major Features
 
+#### Rust Settings Dialog Implementation
+
+- **Native Settings Dialog**: Replaced React-based settings dialog with native Rust implementation
+- **Comprehensive Settings Management**:
+  - Provider configuration with API key management
+  - Theme switching and appearance customization
+  - Preferences and advanced settings
+  - Export/import functionality with security exclusions
+- **Real-time Synchronization**: Settings changes propagate immediately via Tauri events
+- **Enhanced Security**: API keys stored securely using Tauri store plugin
+- **Provider Testing**: Built-in connection testing for all LLM providers
+- **Theme Integration**: Seamless theme switching with OS detection support
+
 #### Store Architecture Refactoring
 
 - **Modular Store Structure**: Refactored monolithic 1282-line store into focused slices

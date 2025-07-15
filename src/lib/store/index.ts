@@ -1,5 +1,6 @@
 import { sessionService } from "@/lib/session-service";
 import { settingsService } from "@/lib/settings-service";
+import { invoke } from "@tauri-apps/api/core";
 import { create } from "zustand";
 import { createAutoSaveSlice } from "./slices/autosave-slice";
 import { createCanvasSlice } from "./slices/canvas-slice";
@@ -25,6 +26,9 @@ export const useStore = create<StoreState>((set, get, store) => ({
     set({ isLoading: true, error: null });
 
     try {
+      // Initialize Rust settings backend
+      await invoke("init_settings");
+
       // Initialize services
       await sessionService.initialize();
       await settingsService.initialize();

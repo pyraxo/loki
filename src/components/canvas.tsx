@@ -88,7 +88,6 @@ export default function Canvas() {
     viewport,
     setNodes,
     setEdges,
-    setViewport,
     setNodesInternal,
     setEdgesInternal,
     setViewportInternal,

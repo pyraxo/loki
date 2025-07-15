@@ -31,24 +31,24 @@ export function useTextHistory(nodeId: string, isSelected: boolean) {
           event.preventDefault();
           event.stopPropagation();
           const undoSuccess = handleUndo();
-          if (undoSuccess && process.env.NODE_ENV === 'development') {
-            console.log("Undo applied");
+          if (process.env.NODE_ENV === 'development') {
+            console.log("Undo applied:", undoSuccess);
           }
         } else if (event.key === "z" && event.shiftKey) {
           // Redo (Ctrl/Cmd+Shift+Z)
           event.preventDefault();
           event.stopPropagation();
           const redoSuccess = handleRedo();
-          if (redoSuccess && process.env.NODE_ENV === 'development') {
-            console.log("Redo applied");
+          if (process.env.NODE_ENV === 'development') {
+            console.log("Redo applied:", redoSuccess);
           }
         } else if (event.key === "y" && !event.shiftKey) {
           // Alternative redo shortcut (Ctrl/Cmd+Y)
           event.preventDefault();
           event.stopPropagation();
           const redoSuccess = handleRedo();
-          if (redoSuccess && process.env.NODE_ENV === 'development') {
-            console.log("Redo applied");
+          if (process.env.NODE_ENV === 'development') {
+            console.log("Redo applied:", redoSuccess);
           }
         }
       }

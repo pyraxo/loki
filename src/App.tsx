@@ -1,13 +1,13 @@
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import SettingsDialog from "@/components/settings/SettingsDialog";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { RenameDialog } from "@/components/ui/rename-dialog";
-import SettingsDialog from "@/components/settings/SettingsDialog";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 const queryClient = new QueryClient();
 

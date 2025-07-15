@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { type StateCreator } from "zustand";
 import { type DialogSlice, type StoreState } from "../types";
 
@@ -84,31 +85,42 @@ export const createDialogSlice: StateCreator<
     });
   },
 
-  // Settings dialog actions
-  openSettingsDialog: (tab: string = "providers") => {
-    set({
-      settingsDialog: {
-        isOpen: true,
-        activeTab: tab,
-      },
-    });
+  // Settings dialog actions - now using Rust-based dialog
+  openSettingsDialog: async (tab: string = "providers") => {
+    try {
+      await invoke("open_settings_dialog");
+      // Keep the local state for backward compatibility
+      set({
+        settingsDialog: {
+          isOpen: true,
+          activeTab: tab,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to open settings dialog:", error);
+    }
   },
 
-  closeSettingsDialog: () => {
-    set({
-      settingsDialog: {
-        isOpen: false,
-        activeTab: "providers",
-      },
-    });
+  closeSettingsDialog: async () => {
+    try {
+      await invoke("close_settings_dialog");
+      set({
+        settingsDialog: {
+          isOpen: false,
+          activeTab: "providers",
+        },
+      });
+    } catch (error) {
+      console.error("Failed to close settings dialog:", error);
+    }
   },
 
-  toggleSettingsDialog: () => {
-    set({
-      settingsDialog: {
-        isOpen: !get().settingsDialog.isOpen,
-        activeTab: get().settingsDialog.activeTab,
-      },
-    });
+  toggleSettingsDialog: async () => {
+    const { settingsDialog } = get();
+    if (settingsDialog.isOpen) {
+      await get().closeSettingsDialog();
+    } else {
+      await get().openSettingsDialog();
+    }
   },
 }); 

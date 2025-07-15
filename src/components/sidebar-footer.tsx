@@ -43,13 +43,21 @@ export default function SidebarFooter() {
     return `${enabledCount} providers`;
   };
 
+  const handleOpenSettings = async () => {
+    try {
+      await openSettingsDialog();
+    } catch (error) {
+      console.error("Failed to open settings dialog:", error);
+    }
+  };
+
   return (
     <div className="border-t p-3 space-y-2">
       <Button
         variant="ghost"
         size="sm"
         className="w-full justify-start text-muted-foreground hover:text-foreground"
-        onClick={() => openSettingsDialog()}
+        onClick={handleOpenSettings}
       >
         <Settings className="h-4 w-4 mr-2" />
         Settings

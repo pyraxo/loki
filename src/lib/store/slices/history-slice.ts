@@ -286,4 +286,58 @@ export const createHistorySlice: StateCreator<
 
     set({ nodes: updatedNodes });
   },
+
+  clearTextHistory: (nodeId: string) => {
+    try {
+      const { nodes } = get();
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node || node.type !== "textPrompt") {
+        return;
+      }
+      const textNodeData = node.data as TextPromptNodeData;
+
+      if (textNodeData.history) {
+        textNodeData.history.undoStack = [];
+        textNodeData.history.redoStack = [];
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.error(`[clearTextHistory] Error clearing history for node ${nodeId}:`, error);
+      }
+    }
+  },
+
+  canUndo: (nodeId: string) => {
+    try {
+      const { nodes } = get();
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node || node.type !== "textPrompt") {
+        return false;
+      }
+      const textNodeData = node.data as TextPromptNodeData;
+      return (textNodeData.history?.undoStack?.length ?? 0) > 0;
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.error(`[canUndo] Error checking undo availability for node ${nodeId}:`, error);
+      }
+      return false;
+    }
+  },
+
+  canRedo: (nodeId: string) => {
+    try {
+      const { nodes } = get();
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node || node.type !== "textPrompt") {
+        return false;
+      }
+      const textNodeData = node.data as TextPromptNodeData;
+      return (textNodeData.history?.redoStack?.length ?? 0) > 0;
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.error(`[canRedo] Error checking redo availability for node ${nodeId}:`, error);
+      }
+      return false;
+    }
+  },
 }); 

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="settings.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              border: "hsl(var(--border))",
+              input: "hsl(var(--input))",
+              ring: "hsl(var(--ring))",
+              background: "hsl(var(--background))",
+              foreground: "hsl(var(--foreground))",
+              primary: {
+                DEFAULT: "hsl(var(--primary))",
+                foreground: "hsl(var(--primary-foreground))",
+              },
+              secondary: {
+                DEFAULT: "hsl(var(--secondary))",
+                foreground: "hsl(var(--secondary-foreground))",
+              },
+              destructive: {
+                DEFAULT: "hsl(var(--destructive))",
+                foreground: "hsl(var(--destructive-foreground))",
+              },
+              muted: {
+                DEFAULT: "hsl(var(--muted))",
+                foreground: "hsl(var(--muted-foreground))",
+              },
+              accent: {
+                DEFAULT: "hsl(var(--accent))",
+                foreground: "hsl(var(--accent-foreground))",
+              },
+              popover: {
+                DEFAULT: "hsl(var(--popover))",
+                foreground: "hsl(var(--popover-foreground))",
+              },
+              card: {
+                DEFAULT: "hsl(var(--card))",
+                foreground: "hsl(var(--card-foreground))",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-background text-foreground">
+    <div class="container mx-auto p-6 max-w-4xl">
+      <!-- Header -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold mb-2">Settings</h1>
+        <p class="text-muted-foreground">
+          Configure your LLM providers, appearance, and application preferences.
+        </p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="w-full">
+        <div class="flex space-x-1 rounded-lg bg-muted p-1 mb-6">
+          <button
+            class="tab-button flex-1 rounded-md py-2 px-3 text-sm font-medium transition-colors hover:bg-background hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            data-tab="providers"
+            data-state="active"
+          >
+            Providers
+          </button>
+          <button
+            class="tab-button flex-1 rounded-md py-2 px-3 text-sm font-medium transition-colors hover:bg-background hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            data-tab="appearance"
+          >
+            Appearance
+          </button>
+          <button
+            class="tab-button flex-1 rounded-md py-2 px-3 text-sm font-medium transition-colors hover:bg-background hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            data-tab="preferences"
+          >
+            Preferences
+          </button>
+          <button
+            class="tab-button flex-1 rounded-md py-2 px-3 text-sm font-medium transition-colors hover:bg-background hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            data-tab="advanced"
+          >
+            Advanced
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="h-96 overflow-y-auto">
+          <!-- Providers Tab -->
+          <div id="providers-tab" class="tab-content">
+            <div class="space-y-4">
+              <div id="providers-list">
+                <!-- Provider cards will be dynamically generated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Appearance Tab -->
+          <div id="appearance-tab" class="tab-content hidden">
+            <div class="space-y-4">
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Theme</h3>
+                <p class="text-sm text-muted-foreground mb-3">
+                  Choose your preferred theme mode
+                </p>
+                <select
+                  id="theme-select"
+                  class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="system">System</option>
+                </select>
+              </div>
+
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Layout</h3>
+                <div class="space-y-3">
+                  <div>
+                    <label class="text-sm font-medium">Sidebar Width</label>
+                    <input
+                      type="range"
+                      id="sidebar-width"
+                      min="280"
+                      max="400"
+                      step="10"
+                      class="w-full mt-1"
+                    />
+                    <div
+                      class="flex justify-between text-xs text-muted-foreground mt-1"
+                    >
+                      <span>280px</span>
+                      <span id="sidebar-width-value">320px</span>
+                      <span>400px</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="compact-mode"
+                      class="rounded border-input"
+                    />
+                    <label for="compact-mode" class="text-sm font-medium"
+                      >Compact Mode</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences Tab -->
+          <div id="preferences-tab" class="tab-content hidden">
+            <div class="space-y-4">
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Auto-save</h3>
+                <div>
+                  <label class="text-sm font-medium"
+                    >Auto-save interval (seconds)</label
+                  >
+                  <input
+                    type="range"
+                    id="auto-save-interval"
+                    min="10"
+                    max="300"
+                    step="10"
+                    class="w-full mt-1"
+                  />
+                  <div
+                    class="flex justify-between text-xs text-muted-foreground mt-1"
+                  >
+                    <span>10s</span>
+                    <span id="auto-save-value">30s</span>
+                    <span>300s</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Model Defaults</h3>
+                <div class="space-y-3">
+                  <div>
+                    <label class="text-sm font-medium"
+                      >Default Temperature</label
+                    >
+                    <input
+                      type="range"
+                      id="temperature"
+                      min="0"
+                      max="2"
+                      step="0.1"
+                      class="w-full mt-1"
+                    />
+                    <div
+                      class="flex justify-between text-xs text-muted-foreground mt-1"
+                    >
+                      <span>0.0</span>
+                      <span id="temperature-value">0.7</span>
+                      <span>2.0</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium"
+                      >Default Max Tokens</label
+                    >
+                    <input
+                      type="number"
+                      id="max-tokens"
+                      min="1"
+                      max="4096"
+                      class="w-full mt-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Advanced</h3>
+                <div class="space-y-3">
+                  <div class="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="debug-mode"
+                      class="rounded border-input"
+                    />
+                    <label for="debug-mode" class="text-sm font-medium"
+                      >Debug Mode</label
+                    >
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="analytics"
+                      class="rounded border-input"
+                    />
+                    <label for="analytics" class="text-sm font-medium"
+                      >Enable Analytics</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Tab -->
+          <div id="advanced-tab" class="tab-content hidden">
+            <div class="space-y-4">
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Data Management</h3>
+                <div class="space-y-3">
+                  <button
+                    id="export-settings"
+                    class="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80 py-2 px-4 rounded-md transition-colors"
+                  >
+                    Export Settings
+                  </button>
+                  <button
+                    id="import-settings"
+                    class="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80 py-2 px-4 rounded-md transition-colors"
+                  >
+                    Import Settings
+                  </button>
+                  <button
+                    id="reset-settings"
+                    class="w-full bg-destructive text-destructive-foreground hover:bg-destructive/80 py-2 px-4 rounded-md transition-colors"
+                  >
+                    Reset to Defaults
+                  </button>
+                </div>
+              </div>
+
+              <div class="bg-card rounded-lg border p-4">
+                <h3 class="font-semibold mb-3">Debug Information</h3>
+                <div class="text-sm text-muted-foreground space-y-1">
+                  <p>Version: <span id="app-version">1.0.0</span></p>
+                  <p>Settings loaded: <span id="settings-loaded">No</span></p>
+                  <p>Last saved: <span id="last-saved">Never</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div
+      id="loading-overlay"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center hidden"
+    >
+      <div class="bg-background rounded-lg p-6 max-w-sm w-full mx-4">
+        <div class="flex items-center space-x-3">
+          <div
+            class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"
+          ></div>
+          <span id="loading-text">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div
+      id="confirmation-modal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center hidden"
+    >
+      <div class="bg-background rounded-lg p-6 max-w-sm w-full mx-4">
+        <h3 class="font-semibold mb-2" id="modal-title">Confirm Action</h3>
+        <p class="text-sm text-muted-foreground mb-4" id="modal-message">
+          Are you sure?
+        </p>
+        <div class="flex space-x-2">
+          <button
+            id="modal-cancel"
+            class="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 py-2 px-4 rounded-md transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            id="modal-confirm"
+            class="flex-1 bg-primary text-primary-foreground hover:bg-primary/80 py-2 px-4 rounded-md transition-colors"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="settings.js"></script>
+  </body>
+</html>

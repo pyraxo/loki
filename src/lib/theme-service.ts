@@ -29,9 +29,6 @@ class ThemeService {
     try {
       const { settings } = (await import("@/lib/store")).useStore.getState();
 
-      // Import next-themes useTheme hook dynamically
-      const { useTheme } = await import("next-themes");
-
       // This method is mainly for initialization
       // Real-time sync is handled by the theme sync hook
       console.log(`Theme loaded from settings: ${settings.theme}`);
@@ -90,20 +87,6 @@ class ThemeService {
    */
   onThemeChange(callback: (theme: ThemeMode) => void): void {
     this.themeChangedCallback = callback;
-  }
-
-  /**
-   * Validate theme value
-   */
-  private validateTheme(theme: string): ThemeMode {
-    const validThemes: ThemeMode[] = ["light", "dark", "system"];
-
-    if (validThemes.includes(theme as ThemeMode)) {
-      return theme as ThemeMode;
-    }
-
-    console.warn(`Invalid theme value: ${theme}, defaulting to 'system'`);
-    return "system";
   }
 
   /**
