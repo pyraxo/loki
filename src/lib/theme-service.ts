@@ -23,31 +23,10 @@ class ThemeService {
   }
 
   /**
-   * Sync theme from Zustand store to next-themes
-   */
-  async syncThemeFromSettings(): Promise<void> {
-    try {
-      const { settings } = (await import("@/lib/store")).useStore.getState();
-
-      // Import next-themes useTheme hook dynamically
-      const { useTheme } = await import("next-themes");
-
-      // This method is mainly for initialization
-      // Real-time sync is handled by the theme sync hook
-      console.log(`Theme loaded from settings: ${settings.theme}`);
-    } catch (error) {
-      console.error("Failed to sync theme from settings:", error);
-    }
-  }
-
-  /**
    * Initialize theme system on app startup
    */
   async initializeTheme(): Promise<void> {
     try {
-      // Load settings to get persisted theme
-      await this.syncThemeFromSettings();
-
       // Setup system theme change detection
       this.setupSystemThemeDetection();
 
@@ -90,20 +69,6 @@ class ThemeService {
    */
   onThemeChange(callback: (theme: ThemeMode) => void): void {
     this.themeChangedCallback = callback;
-  }
-
-  /**
-   * Validate theme value
-   */
-  private validateTheme(theme: string): ThemeMode {
-    const validThemes: ThemeMode[] = ["light", "dark", "system"];
-
-    if (validThemes.includes(theme as ThemeMode)) {
-      return theme as ThemeMode;
-    }
-
-    console.warn(`Invalid theme value: ${theme}, defaulting to 'system'`);
-    return "system";
   }
 
   /**
