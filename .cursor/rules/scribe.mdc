@@ -10,7 +10,7 @@ alwaysApply: true
 
 ## Implementation Plans
 
-- When you are saving an implementation plan from Planner Mode, save it in the `doc/plans` folder in the format `DDMMYY-filename.md`. For e.g., `docs/plans/090725-sidebar-plan.md`.
+- When you are saving an implementation plan from Planner Mode, save it in the `doc/plans` folder in the format `YYMMDD-filename.md`. For e.g., `docs/plans/090725-sidebar-plan.md`.
 
 ## Feature Completion
 

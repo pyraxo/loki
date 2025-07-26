@@ -364,30 +364,30 @@ connect settings to app functionality:
 
 ### **Phase 1: Foundation**
 
-- [ ] Create settings type definitions
-- [ ] Implement settings service with Tauri secure store
-- [ ] Add settings state to Zustand store
+- [x] Create settings type definitions
+- [x] Implement settings service with Tauri secure store
+- [x] Add settings state to Zustand store
 
 ### **Phase 2: Core Components**
 
-- [ ] Build settings dialog with tabbed interface
-- [ ] Create provider settings tab with API key management
-- [ ] Add appearance and preferences tabs
-- [ ] Implement sidebar footer component
+- [x] Build settings dialog with tabbed interface
+- [x] Create provider settings tab with API key management
+- [x] Add appearance and preferences tabs
+- [x] Implement sidebar footer component
 
 ### **Phase 3: Integration**
 
-- [ ] Refactor LLM service for configurable providers
-- [ ] Add settings loading to app initialization
-- [ ] Connect theme settings to UI
-- [ ] Update default parameters in node creation
+- [x] Refactor LLM service for configurable providers
+- [x] Add settings loading to app initialization
+- [x] Connect theme settings to UI
+- [x] Update default parameters in node creation
 
 ### **Phase 4: Security & Polish**
 
-- [ ] Implement API key validation
-- [ ] Add provider connectivity testing
-- [ ] Create export/import functionality
-- [ ] Add settings reset option
+- [x] Implement API key validation
+- [x] Add provider connectivity testing
+- [x] Create export/import functionality
+- [x] Add settings reset option
 
 ---
 
