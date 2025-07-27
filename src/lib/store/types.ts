@@ -19,6 +19,7 @@ export interface CanvasSlice {
   updateNodeData: (nodeId: string, data: Partial<BaseNodeData & Record<string, any>>) => void;
   updateNodeDataDuringExecution: (nodeId: string, data: Partial<BaseNodeData & Record<string, any>>) => void;
   updateNodeStatus: (nodeId: string, status: "idle" | "running" | "success" | "error", error?: string) => void;
+  duplicateNode: (nodeId: string) => void;
 }
 
 // Workflow slice types

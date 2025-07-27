@@ -10,12 +10,13 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { NodeContextMenu } from "@/components/NodeContextMenu";
 import { useResolvedTheme } from "@/hooks/use-theme-sync";
 import { useStore } from "@/lib/store";
 import type { CustomNode } from "@/types/nodes";
 import { NodeType } from "@/types/nodes";
 import { MessageSquare, Plus } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CATEGORIES, NODE_TYPES } from "@/components/session/NodeLibrary";
 import {
@@ -98,6 +99,19 @@ export default function Canvas() {
   } = useStore();
   const { resolvedTheme } = useResolvedTheme();
   const canvasRef = useRef<HTMLDivElement>(null);
+  
+  // State for node context menu
+  const [nodeContextMenu, setNodeContextMenu] = useState<{
+    show: boolean;
+    x: number;
+    y: number;
+    node: CustomNode | null;
+  }>({
+    show: false,
+    x: 0,
+    y: 0,
+    node: null,
+  });
 
   // Convert theme to React Flow ColorMode
   const colorMode: ColorMode = resolvedTheme === "dark" ? "dark" : "light";
@@ -310,6 +324,52 @@ export default function Canvas() {
     [setViewportInternal]
   );
 
+  // Handle node context menu (right-click on node)
+  const onNodeContextMenu = useCallback(
+    (event: MouseEvent | React.MouseEvent, node: CustomNode) => {
+      event.preventDefault();
+      
+      // Calculate position with viewport boundary handling
+      const menuWidth = 192; // w-48 = 12rem = 192px
+      const menuHeight = 40; // Approximate height for single item
+      const padding = 10;
+      
+      let x = event.clientX;
+      let y = event.clientY;
+      
+      // Adjust if menu would go off screen
+      if (x + menuWidth > window.innerWidth) {
+        x = window.innerWidth - menuWidth - padding;
+      }
+      if (y + menuHeight > window.innerHeight) {
+        y = window.innerHeight - menuHeight - padding;
+      }
+      
+      setNodeContextMenu({
+        show: true,
+        x,
+        y,
+        node,
+      });
+    },
+    []
+  );
+
+  // Handle pane context menu (right-click on canvas)
+  const onPaneContextMenu = useCallback(
+    () => {
+      // Hide node context menu if it's open
+      setNodeContextMenu({
+        show: false,
+        x: 0,
+        y: 0,
+        node: null,
+      });
+    },
+    []
+  );
+
+
   // Handle creating a new session and loading it
   const handleCreateSession = async () => {
     try {
@@ -363,6 +423,8 @@ export default function Canvas() {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               onViewportChange={onViewportChange}
+              onNodeContextMenu={onNodeContextMenu}
+              onPaneContextMenu={onPaneContextMenu}
               viewport={viewport}
               colorMode={colorMode}
               proOptions={{ hideAttribution: true }}
@@ -409,6 +471,16 @@ export default function Canvas() {
           ))}
         </ContextMenuContent>
       </ContextMenu>
+
+      {/* Node Context Menu */}
+      {nodeContextMenu.show && nodeContextMenu.node && (
+        <NodeContextMenu 
+          node={nodeContextMenu.node} 
+          x={nodeContextMenu.x}
+          y={nodeContextMenu.y}
+          onClose={() => setNodeContextMenu({ show: false, x: 0, y: 0, node: null })}
+        />
+      )}
     </div>
   );
 }
