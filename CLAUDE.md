@@ -27,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Implementation Plans
 
 - When you are saving an implementation plan from Planner Mode, save it in the `docs/plans` folder in the format `YYMMDD-filename.md`. For e.g., `docs/plans/090725-sidebar-plan.md`.
+- After an implementation plan is given the OK to continue, always write the plan into documentation in `/plans` in the format explained in CLAUDE.md
 
 ### Feature Completion
 
@@ -216,3 +217,27 @@ import { Button } from "@/components/ui/button";
 - Workflow execution engine handles complex node dependencies and streaming
 - Auto-save functionality tracks unsaved changes and periodically saves sessions
 - Theme system synchronizes between next-themes and internal store state
+
+## Known Limitations
+
+### React Flow Text Rendering at Zoom Levels
+
+**Issue:** Text and UI elements appear fuzzy/blurry when zooming into the React Flow canvas above 1x zoom level.
+
+**Root Cause:** This is an inherent limitation of CSS transform-based zooming in web browsers, particularly Chrome. React Flow uses `transform: scale()` for zoom implementation, which causes subpixel positioning issues that result in blurry text rendering.
+
+**Investigation Results:**
+- DOM complexity is NOT the cause - even minimal HTML structures (`div/label/textarea`) exhibit the same blurriness
+- Component choice doesn't matter - shadcn/ui vs. pure HTML makes no difference
+- CSS optimizations (font-smoothing, text-rendering) provide minimal improvement
+- This is a 7-year-old known Chrome browser limitation that developers consider "intended behavior"
+
+**Why This Happens:**
+- React Flow scales the entire viewport using CSS transforms
+- Elements end up positioned between pixel boundaries (subpixel positioning)
+- Chrome's rendering engine handles this poorly compared to Firefox/Safari
+- All CSS transform-based canvas libraries have this limitation
+
+**Resolution:** Accept this as a browser limitation. Web-based diagram tools universally have this trade-off compared to native applications. The React Flow architecture is sound - the issue exists at the browser rendering level.
+
+**For Future Reference:** Do not attempt to "optimize" node components to fix text blurriness during zoom. The issue is at the viewport transform level, not individual node implementation.
