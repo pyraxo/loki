@@ -1,12 +1,3 @@
-import {
-  Play,
-  MessageSquare,
-  Brain,
-  FileOutput,
-  GitBranch,
-  Timer,
-  Merge,
-} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -15,6 +6,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NodeType } from "@/types/nodes";
+import {
+  Brain,
+  FileOutput,
+  GitBranch,
+  Merge,
+  MessageSquare,
+  Play,
+  Timer,
+} from "lucide-react";
 
 interface NodeTypeInfo {
   type: NodeType;

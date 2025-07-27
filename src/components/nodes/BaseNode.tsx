@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useResolvedTheme } from "@/hooks/use-theme-sync";
 import { BaseNodeData } from "@/types/nodes";
 import { Handle, NodeResizer, Position } from "@xyflow/react";
 import { Loader2 } from "lucide-react";
@@ -27,6 +28,8 @@ export function NodeWrapper({
   hasSourceHandle = true,
   selected = false,
 }: NodeWrapperProps) {
+  const { resolvedTheme } = useResolvedTheme();
+
   const getStatusColor = () => {
     switch (data.status) {
       case "running":
@@ -57,13 +60,13 @@ export function NodeWrapper({
     >
       <NodeResizer
         isVisible={selected}
-        color="white"
+        color={resolvedTheme === "dark" ? "white" : "black"}
         minWidth={minWidth}
         minHeight={minHeight}
       />
       {hasTargetHandle && <Handle type="target" position={Position.Top} />}
 
-      <CardHeader className="pb-2 pt-6 px-4 cursor-move border-b-1 rounded-t-lg node-drag flex-shrink-0">
+      <CardHeader className="pb-2 pt-6 px-4 cursor-move border-b-1 node-drag flex-shrink-0">
         <CardTitle className="text-sm flex items-center justify-between">
           {icon} {title}
           <Badge variant={data.status === "running" ? "default" : "secondary"}>
